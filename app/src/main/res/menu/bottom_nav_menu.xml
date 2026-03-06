@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_matieres"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Matières" />
+
+    <item
+        android:id="@+id/nav_taches"
+        android:icon="@android:drawable/checkbox_on_background"
+        android:title="Tâches" />
+
+    <item
+        android:id="@+id/nav_planning"
+        android:icon="@android:drawable/ic_menu_today"
+        android:title="Planning" />
+
+    <item
+        android:id="@+id/nav_progression"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Progression" />
+
+    <item
+        android:id="@+id/nav_profil"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Profil" />
+
+</menu>
