@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
         <activity
+            android:name=".ui.modules.ModulesActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
