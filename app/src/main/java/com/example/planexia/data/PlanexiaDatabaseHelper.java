@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class PlanexiaDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "planexia.db";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     // Table names (contrat)
     public static final String T_USERS = "users";
@@ -32,7 +32,8 @@ public class PlanexiaDatabaseHelper extends SQLiteOpenHelper {
     public static final String C_OBJECTIVE_ID = "objective_id";
     public static final String C_IS_DONE = "is_done"; // 0/1
     public static final String C_RESOURCE_TEXT = "resource_text";
-
+    public static final String C_COEFFICIENT = "coefficient";
+    public static final String C_COLOR = "color";
     public PlanexiaDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -62,6 +63,8 @@ public class PlanexiaDatabaseHelper extends SQLiteOpenHelper {
                         C_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         C_USER_ID + " INTEGER NOT NULL," +
                         C_NAME + " TEXT NOT NULL," +
+                        C_COEFFICIENT + " INTEGER NOT NULL," +
+                        C_COLOR + " TEXT NOT NULL," +
                         "FOREIGN KEY(" + C_USER_ID + ") REFERENCES " + T_USERS + "(" + C_ID + ") ON DELETE CASCADE" +
                         ");"
         );
