@@ -1,5 +1,6 @@
 package com.example.planexia.ui.adapters;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,16 @@ import java.util.List;
 public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleViewHolder> {
 
     private List<Module> moduleList;
+    private OnModuleActionListener listener;
 
-    public ModuleAdapter(List<Module> moduleList) {
+    public interface OnModuleActionListener {
+        void onDeleteClick(int position);
+        void onEditClick(int position);
+    }
+
+    public ModuleAdapter(List<Module> moduleList, OnModuleActionListener listener) {
         this.moduleList = moduleList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -40,20 +48,24 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
 
         try {
             holder.viewColor.setBackgroundTintList(
-                    android.content.res.ColorStateList.valueOf(Color.parseColor(module.getColor()))
+                    ColorStateList.valueOf(Color.parseColor(module.getColor()))
             );
         } catch (Exception e) {
             holder.viewColor.setBackgroundTintList(
-                    android.content.res.ColorStateList.valueOf(Color.GRAY)
+                    ColorStateList.valueOf(Color.GRAY)
             );
         }
 
-        holder.ivEdit.setOnClickListener(v -> {
-            // plus tard : ouvrir AddModuleActivity en mode édition
+        holder.ivDelete.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteClick(holder.getAdapterPosition());
+            }
         });
 
-        holder.ivDelete.setOnClickListener(v -> {
-            // plus tard : supprimer l'élément
+        holder.ivEdit.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEditClick(holder.getAdapterPosition());
+            }
         });
     }
 

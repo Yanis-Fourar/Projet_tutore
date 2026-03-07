@@ -23,9 +23,9 @@
             android:background="@drawable/bg_color_circle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <!-- Nom -->
+        <!-- Nom du module -->
         <TextView
             android:id="@+id/tvName"
             android:layout_width="0dp"
@@ -37,7 +37,7 @@
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/viewColor"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/ivEdit" />
+            app:layout_constraintEnd_toStartOf="@id/ivEdit"/>
 
         <!-- Coefficient -->
         <TextView
@@ -50,32 +50,38 @@
             android:textColor="#7A7A7A"
             android:textSize="13sp"
             app:layout_constraintStart_toEndOf="@id/viewColor"
-            app:layout_constraintTop_toBottomOf="@id/tvName" />
+            app:layout_constraintTop_toBottomOf="@id/tvName"/>
 
-        <!-- Modifier -->
+        <!-- Bouton Modifier -->
         <ImageView
             android:id="@+id/ivEdit"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Modifier"
             android:src="@android:drawable/ic_menu_edit"
             app:tint="#9AA0AE"
-            android:contentDescription="Modifier"
-            android:layout_marginEnd="18dp"
-            app:layout_constraintEnd_toStartOf="@id/ivDelete"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivDelete"/>
 
-        <!-- Supprimer -->
+        <!-- Bouton Supprimer -->
         <ImageView
             android:id="@+id/ivDelete"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Supprimer"
             android:src="@android:drawable/ic_menu_delete"
             app:tint="#9AA0AE"
-            android:contentDescription="Supprimer"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
