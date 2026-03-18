@@ -24,6 +24,7 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
     public interface OnModuleActionListener {
         void onDeleteClick(int position);
         void onEditClick(int position);
+        void onModuleClick(int position); // clic sur l'item → ouvre les objectifs
     }
 
     public ModuleAdapter(List<Module> moduleList, OnModuleActionListener listener) {
@@ -56,23 +57,22 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
             );
         }
 
+        // Clic sur l'item → objectifs
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onModuleClick(holder.getAdapterPosition());
+        });
+
         holder.ivDelete.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onDeleteClick(holder.getAdapterPosition());
-            }
+            if (listener != null) listener.onDeleteClick(holder.getAdapterPosition());
         });
 
         holder.ivEdit.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEditClick(holder.getAdapterPosition());
-            }
+            if (listener != null) listener.onEditClick(holder.getAdapterPosition());
         });
     }
 
     @Override
-    public int getItemCount() {
-        return moduleList.size();
-    }
+    public int getItemCount() { return moduleList.size(); }
 
     public static class ModuleViewHolder extends RecyclerView.ViewHolder {
         View viewColor;
