@@ -26,7 +26,6 @@ public class PlanexiaRepository {
         return db.insert(PlanexiaDatabaseHelper.T_USERS, null, values);
     }
 
-    // Retourne userId ou -1
     public long login(String email, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
@@ -123,23 +122,33 @@ public class PlanexiaRepository {
         return db.insert(PlanexiaDatabaseHelper.T_OBJECTIVES, null, values);
     }
 
-    public List<Long> getObjectivesByModule(long moduleId) {
+    public List<Objective> getObjectivesByModule(long moduleId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
                 PlanexiaDatabaseHelper.T_OBJECTIVES,
-                new String[]{PlanexiaDatabaseHelper.C_ID},
+                new String[]{
+                        PlanexiaDatabaseHelper.C_ID,
+                        PlanexiaDatabaseHelper.C_TITLE,
+                        PlanexiaDatabaseHelper.C_DUE_DATE
+                },
                 PlanexiaDatabaseHelper.C_MODULE_ID + " = ?",
                 new String[]{String.valueOf(moduleId)},
                 null, null,
                 PlanexiaDatabaseHelper.C_ID + " DESC"
         );
 
-        List<Long> ids = new ArrayList<>();
+        List<Objective> objectives = new ArrayList<>();
+
         while (c.moveToNext()) {
-            ids.add(c.getLong(0));
+            int id = c.getInt(0);
+            String title = c.getString(1);
+            String dueDate = c.getString(2);
+
+            objectives.add(new Objective(id, title, dueDate));
         }
+
         c.close();
-        return ids;
+        return objectives;
     }
 
     // ---------- TASKS ----------
@@ -166,23 +175,37 @@ public class PlanexiaRepository {
         );
     }
 
-    public List<Long> getTasksByObjective(long objectiveId) {
+    public List<Task> getTasksByObjective(long objectiveId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
                 PlanexiaDatabaseHelper.T_TASKS,
-                new String[]{PlanexiaDatabaseHelper.C_ID},
+                new String[]{
+                        PlanexiaDatabaseHelper.C_ID,
+                        PlanexiaDatabaseHelper.C_TITLE,
+                        PlanexiaDatabaseHelper.C_IS_DONE,
+                        PlanexiaDatabaseHelper.C_DUE_DATE,
+                        PlanexiaDatabaseHelper.C_RESOURCE_TEXT
+                },
                 PlanexiaDatabaseHelper.C_OBJECTIVE_ID + " = ?",
                 new String[]{String.valueOf(objectiveId)},
                 null, null,
                 PlanexiaDatabaseHelper.C_ID + " DESC"
         );
 
-        List<Long> ids = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
+
         while (c.moveToNext()) {
-            ids.add(c.getLong(0));
+            int id = c.getInt(0);
+            String title = c.getString(1);
+            boolean isDone = c.getInt(2) == 1;
+            String dueDate = c.getString(3);
+            String resourceText = c.getString(4);
+
+            tasks.add(new Task(id, title, isDone, dueDate, resourceText));
         }
+
         c.close();
-        return ids;
+        return tasks;
     }
 
     // ---------- PLANNING ----------
