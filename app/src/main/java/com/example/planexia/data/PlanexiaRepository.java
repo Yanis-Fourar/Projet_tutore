@@ -144,7 +144,7 @@ public class PlanexiaRepository {
             String title = c.getString(1);
             String dueDate = c.getString(2);
 
-            objectives.add(new Objective(id, title, dueDate));
+            objectives.add(new Objective(id, (int) moduleId, title, dueDate));
         }
 
         c.close();
@@ -201,7 +201,7 @@ public class PlanexiaRepository {
             String dueDate = c.getString(3);
             String resourceText = c.getString(4);
 
-            tasks.add(new Task(id, title, isDone, dueDate, resourceText));
+            tasks.add(new Task(id, (int) objectiveId, title, isDone, dueDate, resourceText));
         }
 
         c.close();
@@ -209,30 +209,78 @@ public class PlanexiaRepository {
     }
 
     // ---------- PLANNING ----------
-    public List<Long> getTasksForDate(long userId, String dateYYYYMMDD) {
+    public List<Task> getTasksForDateWithModule(long userId, String dateYYYYMMDD) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String sql =
-                "SELECT t." + PlanexiaDatabaseHelper.C_ID + " " +
+                "SELECT t." + PlanexiaDatabaseHelper.C_ID + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_TITLE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_IS_DONE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_DUE_DATE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_RESOURCE_TEXT + ", " +
+                        "m." + PlanexiaDatabaseHelper.C_NAME + ", " +
+                        "m." + PlanexiaDatabaseHelper.C_COLOR + " " +
                         "FROM " + PlanexiaDatabaseHelper.T_TASKS + " t " +
                         "JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID + " " +
                         "JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID + " " +
                         "WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ? AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " = ?;";
 
         Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId), dateYYYYMMDD});
-        List<Long> ids = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
         while (c.moveToNext()) {
-            ids.add(c.getLong(0));
+            tasks.add(new Task(
+                    c.getInt(0), c.getInt(1), c.getString(2),
+                    c.getInt(3) == 1, c.getString(4), c.getString(5),
+                    c.getString(6), c.getString(7)
+            ));
         }
         c.close();
-        return ids;
+        return tasks;
     }
 
-    public List<Long> getOverdueTasks(long userId, String todayYYYYMMDD) {
+
+    public List<Task> getTasksForDate(long userId, String dateYYYYMMDD) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String sql =
-                "SELECT t." + PlanexiaDatabaseHelper.C_ID + " " +
+                "SELECT t." + PlanexiaDatabaseHelper.C_ID + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_TITLE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_IS_DONE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_DUE_DATE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_RESOURCE_TEXT + " " +
+                        "FROM " + PlanexiaDatabaseHelper.T_TASKS + " t " +
+                        "JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID + " " +
+                        "JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID + " " +
+                        "WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ? AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " = ?;";
+
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId), dateYYYYMMDD});
+        List<Task> tasks = new ArrayList<>();
+        while (c.moveToNext()) {
+            tasks.add(new Task(
+                    c.getInt(0),
+                    c.getInt(1),
+                    c.getString(2),
+                    c.getInt(3) == 1,
+                    c.getString(4),
+                    c.getString(5)
+            ));
+        }
+        c.close();
+        return tasks;
+    }
+
+    public List<Task> getOverdueTasks(long userId, String todayYYYYMMDD) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String sql =
+                "SELECT t." + PlanexiaDatabaseHelper.C_ID + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_TITLE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_IS_DONE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_DUE_DATE + ", " +
+                        "t." + PlanexiaDatabaseHelper.C_RESOURCE_TEXT + " " +
                         "FROM " + PlanexiaDatabaseHelper.T_TASKS + " t " +
                         "JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID + " " +
                         "JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID + " " +
@@ -242,12 +290,19 @@ public class PlanexiaRepository {
                         "AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " < ?;";
 
         Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId), todayYYYYMMDD});
-        List<Long> ids = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
         while (c.moveToNext()) {
-            ids.add(c.getLong(0));
+            tasks.add(new Task(
+                    c.getInt(0),
+                    c.getInt(1),
+                    c.getString(2),
+                    c.getInt(3) == 1,
+                    c.getString(4),
+                    c.getString(5)
+            ));
         }
         c.close();
-        return ids;
+        return tasks;
     }
 
     public int getObjectiveProgress(long objectiveId) {
