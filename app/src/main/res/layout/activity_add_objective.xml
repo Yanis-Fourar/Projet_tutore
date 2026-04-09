@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F7FB">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvFormTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ajouter un objectif"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1F1F1F"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Titre -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Titre de l'objectif"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etObjectiveTitle"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="Ex: Réviser le chapitre 3"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:inputType="text"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Date limite -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date limite"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Affichage de la date choisie -->
+        <TextView
+            android:id="@+id/tvDeadlineValue"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="Aucune date choisie"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical"
+            android:textColor="#1F1F1F"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Bouton ouvrir le calendrier -->
+        <Button
+            android:id="@+id/btnPickDate"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Choisir une date"
+            android:textAllCaps="false"
+            android:textColor="#8B5CF6"
+            android:background="@drawable/bg_edit_text"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Bouton Sauvegarder -->
+        <Button
+            android:id="@+id/btnSaveObjective"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Ajouter"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_save_button" />
+
+    </LinearLayout>
+</ScrollView>

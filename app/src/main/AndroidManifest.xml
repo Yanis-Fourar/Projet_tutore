@@ -12,12 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
         <activity
-            android:name=".ui.tasks.ObjectiveDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.tasks.TasksActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
