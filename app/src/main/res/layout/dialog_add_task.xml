@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Titre de la task -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nom de la tâche *"
+        android:textStyle="bold"
+        android:textSize="14sp"/>
+
+    <EditText
+        android:id="@+id/etTaskTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ex: Réviser les intégrales"
+        android:inputType="textCapSentences"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Date (optionnel) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date limite (optionnel)"
+        android:textStyle="bold"
+        android:textSize="14sp"/>
+
+    <EditText
+        android:id="@+id/etTaskDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="YYYY-MM-DD  ex: 2025-06-15"
+        android:inputType="date"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Ressource (optionnel) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ressource / Lien (optionnel)"
+        android:textStyle="bold"
+        android:textSize="14sp"/>
+
+    <EditText
+        android:id="@+id/etTaskResource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ex: https://... ou note"
+        android:inputType="textMultiLine"
+        android:lines="2"/>
+
+</LinearLayout>
