@@ -1,13 +1,15 @@
 package com.example.planexia;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.planexia.data.PlanexiaRepository;
+import com.example.planexia.data.SessionManager;
+import com.example.planexia.data.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;
@@ -16,40 +18,41 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * PlanningActivity — affiche les tâches du jour ou de la semaine.
- * Respecte le contrat technique Planexia (V1).
- *
- * En V1 : données de template (hardcodées).
- * En V2 : remplacer buildTemplateTasks() par des appels au Repository.
- */
 public class PlanningActivity extends AppCompatActivity {
 
-    // --- Vues ---
     private Button btnJour;
     private Button btnSemaine;
     private RecyclerView recyclerPlanning;
     private BottomNavigationView bottomNav;
 
-    // --- Adapter ---
     private TaskAdapter taskAdapter;
+    private PlanexiaRepository repository;
+    private SessionManager session;
 
-    // --- État ---
-    private boolean isJourMode = true; // true = vue Jour, false = vue Semaine
-
-    // =========================================================================
+    private boolean isJourMode = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planning);
 
+        repository = new PlanexiaRepository(this);
+        session = new SessionManager(this);
+
+        // Utilisateur de test si aucune session active
+        if (!session.isLoggedIn()) {
+            long userId = repository.createUser("test@planexia.com", "test");
+            if (userId == -1) {
+                userId = repository.login("test@planexia.com", "test");
+            }
+            session.saveUserId(userId);
+            seedTestData(userId);
+        }
+
         initViews();
         setupToggle();
         setupRecyclerView();
         setupBottomNav();
-
-        // Afficher la vue Jour par défaut
         loadJourMode();
     }
 
@@ -63,7 +66,6 @@ public class PlanningActivity extends AppCompatActivity {
         recyclerPlanning = findViewById(R.id.recyclerPlanning);
         bottomNav        = findViewById(R.id.bottomNav);
 
-        // Boutons bannières
         Button btnPremium = findViewById(R.id.btnDebloquerPremium);
         Button btnIA      = findViewById(R.id.btnDecouvrirIA);
 
@@ -91,7 +93,7 @@ public class PlanningActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         taskAdapter = new TaskAdapter(new ArrayList<>(), (task, position) -> {
-            // TODO V2 : ouvrir ObjectiveDetailActivity avec la tâche sélectionnée
+            // TODO : ouvrir le détail de la tâche
         });
         recyclerPlanning.setLayoutManager(new LinearLayoutManager(this));
         recyclerPlanning.setAdapter(taskAdapter);
@@ -119,128 +121,103 @@ public class PlanningActivity extends AppCompatActivity {
     // Chargement des données
     // =========================================================================
 
-    /**
-     * Charge les tâches du jour uniquement.
-     * En V2 : appeler repository.getTasksForDate(userId, today)
-     */
     private void loadJourMode() {
-        String today = getTodayString(); // YYYY-MM-DD
-        List<TaskAdapter.PlanningTask> tasks = buildTemplateTasks(false);
-        taskAdapter.updateTasks(tasks);
+        String today = getTodayString();
+        List<Task> tasks = repository.getTasksForDateWithModule(session.getUserId(), today);
+        taskAdapter.updateTasks(toPlanning(tasks, today));
     }
 
-    /**
-     * Charge les tâches de la semaine complète.
-     * En V2 : appeler repository sur les 7 prochains jours.
-     */
     private void loadSemaineMode() {
-        List<TaskAdapter.PlanningTask> tasks = buildTemplateTasks(true);
-        taskAdapter.updateTasks(tasks);
-    }
+        String today = getTodayString();
+        List<TaskAdapter.PlanningTask> result = new ArrayList<>();
 
-    // =========================================================================
-    // Données de template (à remplacer par le Repository en V2)
-    // =========================================================================
-
-    /**
-     * Génère des tâches de démonstration.
-     * @param semaine true = toute la semaine, false = jour uniquement
-     */
-    private List<TaskAdapter.PlanningTask> buildTemplateTasks(boolean semaine) {
-        List<TaskAdapter.PlanningTask> list = new ArrayList<>();
-
-        // --- AUJOURD'HUI ---
-        String todayLabel = getTodayDisplayLabel(); // ex: "Mercredi 03/12/2025"
-
-        list.add(new TaskAdapter.PlanningTask(
-                "Réviser les dérivées",
-                "Mathématiques",
-                60,
-                todayLabel,  // premier item du groupe → affiche le header
-                true,        // isToday = true → badge "Aujourd'hui"
-                false
-        ));
-
-        list.add(new TaskAdapter.PlanningTask(
-                "TD mécanique",
-                "Physique",
-                45,
-                null,        // même groupe → pas de header
-                false,
-                false
-        ));
-
-        // --- JOURS SUIVANTS (mode Semaine uniquement) ---
-        if (semaine) {
-            list.add(new TaskAdapter.PlanningTask(
-                    "Projet algorithmes",
-                    "Informatique",
-                    120,
-                    getNextDayLabel(1), // ex: "Jeudi 04/12/2025"
-                    false,
-                    false
-            ));
-
-            list.add(new TaskAdapter.PlanningTask(
-                    "Lecture chapitre 5",
-                    "Histoire",
-                    30,
-                    null,
-                    false,
-                    false
-            ));
-
-            list.add(new TaskAdapter.PlanningTask(
-                    "Exercices intégrales",
-                    "Mathématiques",
-                    90,
-                    getNextDayLabel(2),
-                    false,
-                    false
-            ));
-
-            list.add(new TaskAdapter.PlanningTask(
-                    "Rédiger rapport TP",
-                    "Physique",
-                    60,
-                    getNextDayLabel(3),
-                    false,
-                    false
-            ));
+        for (int i = 0; i < 7; i++) {
+            String date = getDateString(i);
+            List<Task> tasks = repository.getTasksForDateWithModule(session.getUserId(), date);
+            result.addAll(toPlanning(tasks, today));
         }
 
-        return list;
+        taskAdapter.updateTasks(result);
+    }
+
+    // =========================================================================
+    // Conversion Task → PlanningTask
+    // =========================================================================
+
+    private List<TaskAdapter.PlanningTask> toPlanning(List<Task> tasks, String todayStr) {
+        List<TaskAdapter.PlanningTask> result = new ArrayList<>();
+        String lastDate = null;
+
+        for (Task t : tasks) {
+            String dueDate = t.getDueDate();
+            boolean isFirstOfGroup = !dueDate.equals(lastDate);
+            String label = isFirstOfGroup ? formatDisplayDate(calendarFromString(dueDate)) : null;
+            boolean isToday = dueDate.equals(todayStr);
+
+            result.add(new TaskAdapter.PlanningTask(
+                    t.getTitle(),
+                    t.getModuleName() != null ? t.getModuleName() : "",
+                    0,
+                    label,
+                    isToday && isFirstOfGroup,
+                    t.isDone()
+            ));
+            lastDate = dueDate;
+        }
+
+        return result;
+    }
+
+    // =========================================================================
+    // Seed données de test (temporaire)
+    // =========================================================================
+
+    private void seedTestData(long userId) {
+        long modMaths  = repository.addModule(userId, "Mathématiques", 3, "#5B2EE8");
+        long modPhysiq = repository.addModule(userId, "Physique",      2, "#4CAF7D");
+
+        long objMaths  = repository.addObjective(modMaths,  "Maîtriser les dérivées", getDateString(7));
+        long objPhysiq = repository.addObjective(modPhysiq, "Préparer le TP mécanique", getDateString(7));
+
+        String today    = getTodayString();
+        String tomorrow = getDateString(1);
+        String j2       = getDateString(2);
+
+        repository.addTask(objMaths,  "Réviser les dérivées",   today,    null);
+        repository.addTask(objPhysiq, "TD mécanique",           today,    null);
+        repository.addTask(objMaths,  "Exercices intégrales",   tomorrow, null);
+        repository.addTask(objPhysiq, "Rédiger rapport TP",     j2,       null);
     }
 
     // =========================================================================
     // Utilitaires de date
     // =========================================================================
 
-    /** Retourne la date du jour au format YYYY-MM-DD (pour la BDD). */
     private String getTodayString() {
+        return getDateString(0);
+    }
+
+    private String getDateString(int daysFromNow) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        return sdf.format(Calendar.getInstance().getTime());
-    }
-
-    /** Retourne la date du jour formatée pour l'affichage : "Mercredi 03/12/2025". */
-    private String getTodayDisplayLabel() {
-        return formatDisplayDate(Calendar.getInstance());
-    }
-
-    /** Retourne la date dans N jours formatée pour l'affichage. */
-    private String getNextDayLabel(int daysFromNow) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, daysFromNow);
-        return formatDisplayDate(cal);
+        return sdf.format(cal.getTime());
     }
 
-    /** Formate un Calendar en "Lundi 01/01/2025". */
+    private Calendar calendarFromString(String dateYYYYMMDD) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(sdf.parse(dateYYYYMMDD));
+            return cal;
+        } catch (Exception e) {
+            return Calendar.getInstance();
+        }
+    }
+
     private String formatDisplayDate(Calendar cal) {
-        // Jour de la semaine en français
         String[] jours = {"Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"};
         String jourSemaine = jours[cal.get(Calendar.DAY_OF_WEEK) - 1];
-
-        // Date au format DD/MM/YYYY
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         return jourSemaine + " " + sdf.format(cal.getTime());
     }
@@ -251,13 +228,11 @@ public class PlanningActivity extends AppCompatActivity {
 
     private void updateToggleUI() {
         if (isJourMode) {
-            // Jour = sélectionné
             btnJour.setBackgroundResource(R.drawable.bg_toggle_selected);
             btnJour.setTextColor(getColor(R.color.purple_primary));
             btnSemaine.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             btnSemaine.setTextColor(android.graphics.Color.parseColor("#888888"));
         } else {
-            // Semaine = sélectionné
             btnSemaine.setBackgroundResource(R.drawable.bg_toggle_selected);
             btnSemaine.setTextColor(getColor(R.color.purple_primary));
             btnJour.setBackgroundColor(android.graphics.Color.TRANSPARENT);
@@ -270,10 +245,10 @@ public class PlanningActivity extends AppCompatActivity {
     // =========================================================================
 
     private void onPremiumClicked() {
-        // TODO V2 : ouvrir l'écran d'achat Premium
+        // TODO : ouvrir l'écran d'achat Premium
     }
 
     private void onIAClicked() {
-        // TODO V2 : lancer la génération IA du planning
+        // TODO : lancer la génération IA du planning
     }
 }
