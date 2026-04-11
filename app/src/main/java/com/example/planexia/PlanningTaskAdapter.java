@@ -17,7 +17,7 @@ import java.util.List;
  * Adapter pour afficher les tâches du planning, groupées par date.
  * Chaque item peut afficher ou non un en-tête de date.
  */
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+public class PlanningTaskAdapter extends RecyclerView.Adapter<PlanningTaskAdapter.TaskViewHolder> {
 
     // Couleurs des barres latérales (cycle selon les modules)
     private static final String[] BAR_COLORS = {
@@ -57,7 +57,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         void onTaskClick(PlanningTask task, int position);
     }
 
-    public TaskAdapter(List<PlanningTask> tasks, OnTaskClickListener listener) {
+    public PlanningTaskAdapter(List<PlanningTask> tasks, OnTaskClickListener listener) {
         this.tasks = tasks;
         this.listener = listener;
     }

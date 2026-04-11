@@ -25,7 +25,7 @@ public class PlanningActivity extends AppCompatActivity {
     private RecyclerView recyclerPlanning;
     private BottomNavigationView bottomNav;
 
-    private TaskAdapter taskAdapter;
+    private PlanningTaskAdapter planningTaskAdapter;
     private PlanexiaRepository repository;
     private SessionManager session;
 
@@ -92,11 +92,11 @@ public class PlanningActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        taskAdapter = new TaskAdapter(new ArrayList<>(), (task, position) -> {
+        planningTaskAdapter = new PlanningTaskAdapter(new ArrayList<>(), (task, position) -> {
             // TODO : ouvrir le détail de la tâche
         });
         recyclerPlanning.setLayoutManager(new LinearLayoutManager(this));
-        recyclerPlanning.setAdapter(taskAdapter);
+        recyclerPlanning.setAdapter(planningTaskAdapter);
         recyclerPlanning.setNestedScrollingEnabled(false);
     }
 
@@ -124,12 +124,12 @@ public class PlanningActivity extends AppCompatActivity {
     private void loadJourMode() {
         String today = getTodayString();
         List<Task> tasks = repository.getTasksForDateWithModule(session.getUserId(), today);
-        taskAdapter.updateTasks(toPlanning(tasks, today));
+        planningTaskAdapter.updateTasks(toPlanning(tasks, today));
     }
 
     private void loadSemaineMode() {
         String today = getTodayString();
-        List<TaskAdapter.PlanningTask> result = new ArrayList<>();
+        List<PlanningTaskAdapter.PlanningTask> result = new ArrayList<>();
 
         for (int i = 0; i < 7; i++) {
             String date = getDateString(i);
@@ -137,15 +137,15 @@ public class PlanningActivity extends AppCompatActivity {
             result.addAll(toPlanning(tasks, today));
         }
 
-        taskAdapter.updateTasks(result);
+        planningTaskAdapter.updateTasks(result);
     }
 
     // =========================================================================
     // Conversion Task → PlanningTask
     // =========================================================================
 
-    private List<TaskAdapter.PlanningTask> toPlanning(List<Task> tasks, String todayStr) {
-        List<TaskAdapter.PlanningTask> result = new ArrayList<>();
+    private List<PlanningTaskAdapter.PlanningTask> toPlanning(List<Task> tasks, String todayStr) {
+        List<PlanningTaskAdapter.PlanningTask> result = new ArrayList<>();
         String lastDate = null;
 
         for (Task t : tasks) {
@@ -154,7 +154,7 @@ public class PlanningActivity extends AppCompatActivity {
             String label = isFirstOfGroup ? formatDisplayDate(calendarFromString(dueDate)) : null;
             boolean isToday = dueDate.equals(todayStr);
 
-            result.add(new TaskAdapter.PlanningTask(
+            result.add(new PlanningTaskAdapter.PlanningTask(
                     t.getTitle(),
                     t.getModuleName() != null ? t.getModuleName() : "",
                     0,
