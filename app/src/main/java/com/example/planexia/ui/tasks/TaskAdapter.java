@@ -1,5 +1,6 @@
 package com.example.planexia.ui.tasks;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextUtils;
@@ -30,7 +31,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public TaskAdapter(List<Task> taskList, OnTaskCheckedListener listener) {
         this.taskList = taskList;
         this.listener = listener;
-        // Date du jour au format YYYY-MM-DD
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             this.today = LocalDate.now().toString();
         } else {
@@ -63,11 +63,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.tvTitle.setTextColor(Color.parseColor("#AAAAAA"));
         } else {
             holder.tvTitle.setPaintFlags(holder.tvTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.tvTitle.setTextColor(Color.parseColor("#1A1A1A"));
+            holder.tvTitle.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#1A1A1A"));
         }
 
         // --- Cercle checkbox ---
-        // Rouge si en retard, vert si fait, violet sinon
         if (task.isDone()) {
             holder.viewCircle.setBackgroundResource(R.drawable.circle_check_green);
         } else if (isLate) {
@@ -80,34 +79,46 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.viewCircle.setOnClickListener(v -> {
             boolean newState = !task.isDone();
             task.setDone(newState);
-            notifyItemChanged(position);
+            notifyItemChanged(holder.getAdapterPosition());
             if (listener != null) listener.onChecked(task.getId(), newState);
         });
 
-        // --- Matière (module name si dispo) ---
-        // Le champ resourceText est réutilisé pour stocker le nom du module ici
-        // On utilisera tvTaskModule pour ça
-        holder.tvModule.setText(""); // sera rempli si on a l'info
+        // --- Pastille couleur du module ---
+        String moduleColor = task.getModuleColor();
+        try {
+            holder.viewModuleColor.setBackgroundTintList(
+                    ColorStateList.valueOf(Color.parseColor(moduleColor))
+            );
+        } catch (Exception e) {
+            holder.viewModuleColor.setBackgroundTintList(
+                    ColorStateList.valueOf(Color.parseColor("#7B1FA2"))
+            );
+        }
+
+        // --- Nom du module ---
+        String moduleName = task.getModuleName();
+        if (!TextUtils.isEmpty(moduleName)) {
+            holder.tvModule.setVisibility(View.VISIBLE);
+            holder.viewModuleColor.setVisibility(View.VISIBLE);
+            holder.tvModule.setText(moduleName);
+            holder.tvModule.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#888888"));
+        } else {
+            holder.tvModule.setVisibility(View.GONE);
+            holder.viewModuleColor.setVisibility(View.GONE);
+        }
 
         // --- Date ---
         if (!TextUtils.isEmpty(dueDate)) {
             holder.tvDate.setVisibility(View.VISIBLE);
             holder.tvDateSep.setVisibility(View.VISIBLE);
-            // Formater YYYY-MM-DD → "3 déc."
             holder.tvDate.setText(formatDate(dueDate));
-            if (isLate) {
-                holder.tvDate.setTextColor(Color.parseColor("#F44336"));
-                holder.tvModule.setTextColor(Color.parseColor("#F44336"));
-            } else {
-                holder.tvDate.setTextColor(Color.parseColor("#888888"));
-                holder.tvModule.setTextColor(Color.parseColor("#888888"));
-            }
+            holder.tvDate.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#888888"));
         } else {
             holder.tvDate.setVisibility(View.GONE);
             holder.tvDateSep.setVisibility(View.GONE);
         }
 
-        // --- Ressource (durée ou lien) ---
+        // --- Ressource ---
         if (!TextUtils.isEmpty(task.getResourceText())) {
             holder.tvResource.setVisibility(View.VISIBLE);
             holder.tvResourceSep.setVisibility(View.VISIBLE);
@@ -125,12 +136,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
     }
 
-    // Convertit YYYY-MM-DD en "3 déc."
     private String formatDate(String date) {
         try {
             String[] parts = date.split("-");
             int month = Integer.parseInt(parts[1]);
-            int day = Integer.parseInt(parts[2]);
+            int day   = Integer.parseInt(parts[2]);
             String[] months = {"jan.", "fév.", "mar.", "avr.", "mai", "juin",
                     "juil.", "août", "sep.", "oct.", "nov.", "déc."};
             return day + " " + months[month - 1];
@@ -144,16 +154,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView viewCircle, tvTitle, tvModule, tvDate, tvDateSep, tvResource, tvResourceSep;
+        View viewModuleColor;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
-            viewCircle   = itemView.findViewById(R.id.viewTaskCircle);
-            tvTitle      = itemView.findViewById(R.id.tvTaskTitle);
-            tvModule     = itemView.findViewById(R.id.tvTaskModule);
-            tvDate       = itemView.findViewById(R.id.tvTaskDate);
-            tvDateSep    = itemView.findViewById(R.id.tvTaskDateSep);
-            tvResource   = itemView.findViewById(R.id.tvTaskResource);
+            viewCircle    = itemView.findViewById(R.id.viewTaskCircle);
+            tvTitle       = itemView.findViewById(R.id.tvTaskTitle);
+            tvModule      = itemView.findViewById(R.id.tvTaskModule);
+            tvDate        = itemView.findViewById(R.id.tvTaskDate);
+            tvDateSep     = itemView.findViewById(R.id.tvTaskDateSep);
+            tvResource    = itemView.findViewById(R.id.tvTaskResource);
             tvResourceSep = itemView.findViewById(R.id.tvResourceSep);
+            viewModuleColor = itemView.findViewById(R.id.viewModuleColor);
         }
     }
 }

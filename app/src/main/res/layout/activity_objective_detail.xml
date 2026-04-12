@@ -5,53 +5,103 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8F8F8">
+    android:background="#F4F1F8">
 
-    <!-- HEADER VIOLET avec progression -->
+    <!-- HEADER VIOLET avec retour + titre + progression -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:paddingTop="40dp"
-        android:background="#7B1FA2">
+        android:background="#6C3FC5"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="20dp">
 
+        <!-- Ligne retour + titre -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Bouton retour -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnBackDetail"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                app:cardCornerRadius="18dp"
+                app:cardBackgroundColor="#8B5CF6"
+                app:cardElevation="0dp"
+                android:layout_marginEnd="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="‹"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:gravity="center"
+                    android:textStyle="bold"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Titre de l'objectif -->
+            <TextView
+                android:id="@+id/tvObjectiveTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Objectif"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+        </LinearLayout>
+
+        <!-- Label progression -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Progression"
-            android:textColor="#E0CFEA"
-            android:textSize="14sp"/>
+            android:textColor="#D4C5F0"
+            android:textSize="13sp"/>
 
+        <!-- Pourcentage -->
         <TextView
             android:id="@+id/tvProgressPercent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0%"
             android:textColor="#FFFFFF"
-            android:textSize="28sp"
+            android:textSize="32sp"
             android:textStyle="bold"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="2dp"/>
 
+        <!-- Barre de progression -->
         <ProgressBar
             android:id="@+id/progressBarObjective"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="12dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="10dp"
             android:max="100"
             android:progress="0"
             android:progressTint="#FFFFFF"
-            android:progressBackgroundTint="#9C4DB8"/>
+            android:progressBackgroundTint="#9575CD"/>
 
+        <!-- Label nb tâches -->
         <TextView
             android:id="@+id/tvProgressLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 / 0 tâches complétées"
-            android:textColor="#E0CFEA"
+            android:textColor="#D4C5F0"
             android:textSize="13sp"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="6dp"/>
 
     </LinearLayout>
 
@@ -61,20 +111,22 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="8dp"
+        android:padding="12dp"
         android:clipToPadding="false"/>
 
-    <!-- BOUTON AJOUTER -->
+    <!-- BOUTON AJOUTER UNE TÂCHE -->
     <Button
         android:id="@+id/btnAddTask"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="+ Ajouter une tâche"
         android:textColor="#FFFFFF"
-        android:backgroundTint="#7B1FA2"
+        android:textSize="15sp"
+        android:backgroundTint="#6C3FC5"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        app:cornerRadius="16dp"/>
 
     <!-- BOTTOM NAVIGATION -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

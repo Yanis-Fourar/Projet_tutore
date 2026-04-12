@@ -4,54 +4,149 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:background="#FFFFFF"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="24dp">
 
-    <!-- Titre de la task -->
+    <!-- Titre principal -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nouvelle tâche"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Sous-titre étape 3 -->
+    <TextView
+        android:id="@+id/tvDialogAddTaskTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3 / 3 — Détails de la tâche"
+        android:textSize="13sp"
+        android:textColor="#8B5CF6"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Label nom -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nom de la tâche *"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:textSize="14sp"/>
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
 
+    <!-- Champ nom -->
     <EditText
         android:id="@+id/etTaskTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_edit_text"
         android:hint="Ex: Réviser les intégrales"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:inputType="textCapSentences"
-        android:layout_marginBottom="12dp"/>
+        android:textSize="14sp"
+        android:layout_marginBottom="20dp"/>
 
-    <!-- Date (optionnel) -->
+    <!-- Label date OBLIGATOIRE -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Date limite (optionnel)"
+        android:text="Date limite *"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:textSize="14sp"/>
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
 
-    <EditText
-        android:id="@+id/etTaskDate"
+    <!-- Bouton calendrier -->
+    <LinearLayout
+        android:id="@+id/btnPickDate"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="YYYY-MM-DD  ex: 2025-06-15"
-        android:inputType="date"
-        android:layout_marginBottom="12dp"/>
+        android:layout_height="52dp"
+        android:background="@drawable/bg_edit_text"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:focusable="true">
 
-    <!-- Ressource (optionnel) -->
+        <TextView
+            android:id="@+id/tvDateValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Choisir une date"
+            android:textSize="14sp"
+            android:textColor="#1F1F1F"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📅"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+
+    <!-- Label ressource -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ressource / Lien (optionnel)"
+        android:text="Ressource / Durée (optionnel)"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:textSize="14sp"/>
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
 
+    <!-- Champ ressource -->
     <EditText
         android:id="@+id/etTaskResource"
         android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_edit_text"
+        android:hint="Ex: 60min  ou  https://..."
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:inputType="text"
+        android:textSize="14sp"
+        android:layout_marginBottom="28dp"/>
+
+    <!-- Boutons Annuler / Ajouter -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ex: https://... ou note"
-        android:inputType="textMultiLine"
-        android:lines="2"/>
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnDialogCancel"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Annuler"
+            android:textAllCaps="false"
+            android:textColor="#8B5CF6"
+            android:textSize="15sp"
+            android:background="@drawable/bg_edit_text"/>
+
+        <Button
+            android:id="@+id/btnDialogAdd"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Ajouter ✓"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:background="@drawable/bg_save_button"/>
+
+    </LinearLayout>
 
 </LinearLayout>

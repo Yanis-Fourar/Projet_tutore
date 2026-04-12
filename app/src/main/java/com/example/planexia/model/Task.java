@@ -7,6 +7,8 @@ public class Task {
     private boolean isDone;
     private String dueDate;       // format YYYY-MM-DD (peut être null)
     private String resourceText;  // lien / note / ressource (peut être null)
+    private String moduleName;    // nom du module parent (pour affichage dans la liste)
+    private String moduleColor;   // couleur hex du module parent
 
     public Task(long id, String title, boolean isDone, String dueDate, String resourceText) {
         this.id = id;
@@ -14,6 +16,19 @@ public class Task {
         this.isDone = isDone;
         this.dueDate = dueDate;
         this.resourceText = resourceText;
+        this.moduleName = "";
+        this.moduleColor = "#7B1FA2";
+    }
+
+    public Task(long id, String title, boolean isDone, String dueDate, String resourceText,
+                String moduleName, String moduleColor) {
+        this.id = id;
+        this.title = title;
+        this.isDone = isDone;
+        this.dueDate = dueDate;
+        this.resourceText = resourceText;
+        this.moduleName = moduleName != null ? moduleName : "";
+        this.moduleColor = moduleColor != null ? moduleColor : "#7B1FA2";
     }
 
     // Constructeur simplifié (ajout rapide sans date ni ressource)
@@ -23,6 +38,8 @@ public class Task {
         this.isDone = false;
         this.dueDate = null;
         this.resourceText = null;
+        this.moduleName = "";
+        this.moduleColor = "#7B1FA2";
     }
 
     public long getId() { return id; }
@@ -39,4 +56,10 @@ public class Task {
 
     public String getResourceText() { return resourceText; }
     public void setResourceText(String resourceText) { this.resourceText = resourceText; }
+
+    public String getModuleName() { return moduleName; }
+    public void setModuleName(String moduleName) { this.moduleName = moduleName != null ? moduleName : ""; }
+
+    public String getModuleColor() { return moduleColor; }
+    public void setModuleColor(String moduleColor) { this.moduleColor = moduleColor != null ? moduleColor : "#7B1FA2"; }
 }

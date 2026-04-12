@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="24dp">
+
+    <!-- Titre -->
+    <TextView
+        android:id="@+id/tvDialogStepTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nouvelle tâche"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Sous-titre étape -->
+    <TextView
+        android:id="@+id/tvDialogStepSub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1 / 3 — Choisir la matière"
+        android:textSize="13sp"
+        android:textColor="#8B5CF6"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Spinner de sélection -->
+    <Spinner
+        android:id="@+id/spinnerChoice"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_edit_text"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_marginBottom="28dp"/>
+
+    <!-- Boutons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnDialogStepCancel"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Annuler"
+            android:textAllCaps="false"
+            android:textColor="#8B5CF6"
+            android:textSize="15sp"
+            android:background="@drawable/bg_edit_text"/>
+
+        <Button
+            android:id="@+id/btnDialogStepNext"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Suivant →"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:background="@drawable/bg_save_button"/>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,6 +1,7 @@
 package com.example.planexia.ui.modules;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -12,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.R;
+import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.adapters.ModuleAdapter;
 import com.example.planexia.ui.objectives.ObjectivesActivity;
+import com.example.planexia.ui.tasks.TasksActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -27,18 +30,23 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
     private List<Module> moduleList;
     private ImageButton btnAddModule;
 
+    private PlanexiaRepository repository;
+    private long userId = -1;
+
     private final ActivityResultLauncher<Intent> addOrEditModuleLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                            String name = result.getData().getStringExtra("module_name");
-                            int coefficient = result.getData().getIntExtra("module_coefficient", 1);
-                            String color = result.getData().getStringExtra("module_color");
+                            String name        = result.getData().getStringExtra("module_name");
+                            int coefficient    = result.getData().getIntExtra("module_coefficient", 1);
+                            String color       = result.getData().getStringExtra("module_color");
                             boolean isEditMode = result.getData().getBooleanExtra("edit_mode", false);
-                            int editPosition = result.getData().getIntExtra("edit_position", -1);
+                            int editPosition   = result.getData().getIntExtra("edit_position", -1);
+                            int editModuleId   = result.getData().getIntExtra("edit_module_id", -1);
 
-                            if (isEditMode && editPosition != -1) {
+                            if (isEditMode && editPosition != -1 && editModuleId != -1) {
+                                repository.updateModule(editModuleId, name, coefficient, color);
                                 Module module = moduleList.get(editPosition);
                                 module.setName(name);
                                 module.setCoefficient(coefficient);
@@ -46,10 +54,14 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
                                 moduleAdapter.notifyItemChanged(editPosition);
                                 Toast.makeText(this, "Module modifié", Toast.LENGTH_SHORT).show();
                             } else {
-                                int newId = moduleList.size() + 1;
-                                moduleList.add(new Module(newId, name, coefficient, color));
-                                moduleAdapter.notifyItemInserted(moduleList.size() - 1);
-                                Toast.makeText(this, "Module ajouté", Toast.LENGTH_SHORT).show();
+                                long newId = repository.addModule(userId, name, coefficient, color);
+                                if (newId != -1) {
+                                    moduleList.add(new Module((int) newId, name, coefficient, color));
+                                    moduleAdapter.notifyItemInserted(moduleList.size() - 1);
+                                    Toast.makeText(this, "Module ajouté", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(this, "Erreur lors de l'ajout", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
                     }
@@ -60,49 +72,71 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modules);
 
-        rvModules = findViewById(R.id.rvModules);
+        // Récupérer userId depuis SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
+        userId = prefs.getLong("user_id", -1);
+
+        repository   = new PlanexiaRepository(this);
+        rvModules    = findViewById(R.id.rvModules);
         btnAddModule = findViewById(R.id.btnAddModule);
 
-        moduleList = getFakeModules();
+        moduleList    = new ArrayList<>();
         moduleAdapter = new ModuleAdapter(moduleList, this);
         rvModules.setLayoutManager(new LinearLayoutManager(this));
         rvModules.setAdapter(moduleAdapter);
+
+        // Charger les modules depuis la DB
+        reloadModules();
 
         btnAddModule.setOnClickListener(v -> {
             Intent intent = new Intent(ModulesActivity.this, AddModuleActivity.class);
             addOrEditModuleLauncher.launch(intent);
         });
 
-        // Bottom Navigation
+        // ✅ Bottom Navigation — IDs corrects qui correspondent à bottom_nav_menu.xml
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setSelectedItemId(R.id.nav_modules);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_modules) {
-                return true;
-            } else if (id == R.id.nav_tasks) {
-                Toast.makeText(this, "Tâches - à venir", Toast.LENGTH_SHORT).show();
-            } else if (id == R.id.nav_planning) {
-                Toast.makeText(this, "Planning - à venir", Toast.LENGTH_SHORT).show();
-            } else if (id == R.id.nav_progress) {
-                Toast.makeText(this, "Progression - à venir", Toast.LENGTH_SHORT).show();
-            } else if (id == R.id.nav_profile) {
-                Toast.makeText(this, "Profil - à venir", Toast.LENGTH_SHORT).show();
-            }
-            return true;
-        });
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_matieres);
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_matieres) {
+                    return true; // déjà sur cette page
+                } else if (id == R.id.nav_taches) {
+                    startActivity(new Intent(this, TasksActivity.class));
+                    return true;
+                } else if (id == R.id.nav_planning) {
+                    Toast.makeText(this, "Planning — bientôt disponible", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.nav_progression) {
+                    Toast.makeText(this, "Progression — bientôt disponible", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.nav_profil) {
+                    Toast.makeText(this, "Profil — bientôt disponible", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 
-    private List<Module> getFakeModules() {
-        List<Module> list = new ArrayList<>();
-        list.add(new Module(1, "Mathématiques", 3, "#8B5CF6"));
-        list.add(new Module(2, "Physique", 2, "#4F8EF7"));
-        list.add(new Module(3, "Informatique", 4, "#10B981"));
-        return list;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Recharger proprement sans duplication
+        reloadModules();
+    }
+
+    private void reloadModules() {
+        moduleList.clear();
+        if (userId != -1) {
+            moduleList.addAll(repository.getModulesByUser(userId));
+        }
+        moduleAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onModuleClick(int position) {
+        if (position < 0 || position >= moduleList.size()) return;
         Module module = moduleList.get(position);
         Intent intent = new Intent(this, ObjectivesActivity.class);
         intent.putExtra(ObjectivesActivity.EXTRA_MODULE_ID, module.getId());
@@ -113,24 +147,25 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
 
     @Override
     public void onDeleteClick(int position) {
-        if (position != RecyclerView.NO_POSITION) {
-            moduleList.remove(position);
-            moduleAdapter.notifyItemRemoved(position);
-            Toast.makeText(this, "Module supprimé", Toast.LENGTH_SHORT).show();
-        }
+        if (position < 0 || position >= moduleList.size()) return;
+        Module module = moduleList.get(position);
+        repository.deleteModule(module.getId());
+        moduleList.remove(position);
+        moduleAdapter.notifyItemRemoved(position);
+        Toast.makeText(this, "Module supprimé", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEditClick(int position) {
-        if (position != RecyclerView.NO_POSITION) {
-            Module module = moduleList.get(position);
-            Intent intent = new Intent(ModulesActivity.this, AddModuleActivity.class);
-            intent.putExtra("edit_mode", true);
-            intent.putExtra("edit_position", position);
-            intent.putExtra("module_name", module.getName());
-            intent.putExtra("module_coefficient", module.getCoefficient());
-            intent.putExtra("module_color", module.getColor());
-            addOrEditModuleLauncher.launch(intent);
-        }
+        if (position < 0 || position >= moduleList.size()) return;
+        Module module = moduleList.get(position);
+        Intent intent = new Intent(ModulesActivity.this, AddModuleActivity.class);
+        intent.putExtra("edit_mode", true);
+        intent.putExtra("edit_position", position);
+        intent.putExtra("edit_module_id", module.getId());
+        intent.putExtra("module_name", module.getName());
+        intent.putExtra("module_coefficient", module.getCoefficient());
+        intent.putExtra("module_color", module.getColor());
+        addOrEditModuleLauncher.launch(intent);
     }
 }

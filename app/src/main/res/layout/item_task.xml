@@ -31,17 +31,17 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- Titre -->
+            <!-- Titre de la tâche -->
             <TextView
                 android:id="@+id/tvTaskTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Réviser les dérivées"
+                android:text="Titre de la tâche"
                 android:textColor="#1A1A1A"
                 android:textSize="15sp"
                 android:textStyle="bold"/>
 
-            <!-- Matière • Date • Durée -->
+            <!-- Module • Date • Ressource -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -49,21 +49,24 @@
                 android:gravity="center_vertical"
                 android:layout_marginTop="4dp">
 
-                <TextView
+                <!-- Pastille couleur module -->
+                <View
                     android:id="@+id/viewModuleColor"
                     android:layout_width="8dp"
                     android:layout_height="8dp"
                     android:background="@drawable/circle_dot_purple"
-                    android:layout_marginEnd="6dp"/>
+                    android:layout_marginEnd="5dp"/>
 
+                <!-- Nom du module -->
                 <TextView
                     android:id="@+id/tvTaskModule"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mathématiques"
+                    android:text=""
                     android:textColor="#888888"
                     android:textSize="12sp"/>
 
+                <!-- Séparateur date -->
                 <TextView
                     android:id="@+id/tvTaskDateSep"
                     android:layout_width="wrap_content"
@@ -73,15 +76,17 @@
                     android:textSize="12sp"
                     android:visibility="gone"/>
 
+                <!-- Date -->
                 <TextView
                     android:id="@+id/tvTaskDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3 déc."
+                    android:text=""
                     android:textColor="#888888"
                     android:textSize="12sp"
                     android:visibility="gone"/>
 
+                <!-- Séparateur ressource -->
                 <TextView
                     android:id="@+id/tvResourceSep"
                     android:layout_width="wrap_content"
@@ -91,11 +96,12 @@
                     android:textSize="12sp"
                     android:visibility="gone"/>
 
+                <!-- Ressource / durée -->
                 <TextView
                     android:id="@+id/tvTaskResource"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="60min"
+                    android:text=""
                     android:textColor="#888888"
                     android:textSize="12sp"
                     android:visibility="gone"/>
