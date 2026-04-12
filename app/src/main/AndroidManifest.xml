@@ -12,9 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
 
-        <!-- Écran de lancement : Modules -->
         <activity
-            android:name=".ui.modules.ModulesActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,25 +21,13 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity (plus utilisée comme launcher) -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-
-        <!-- Écran Ajouter/Modifier Module -->
-        <activity
-            android:name=".ui.modules.AddModuleActivity"
-            android:exported="false" />
-
-        <!-- Écran Objectifs d'un module -->
-        <activity
-            android:name=".ui.objectives.ObjectivesActivity"
-            android:exported="false" />
-
-        <!-- Écran Ajouter/Modifier Objectif -->
-        <activity
-            android:name=".ui.objectives.AddObjectiveActivity"
-            android:exported="false" />
+        <activity android:name=".ui.modules.ModulesActivity" />
+        <activity android:name=".ui.modules.AddModuleActivity" />
+        <activity android:name=".ui.objectives.ObjectivesActivity" />
+        <activity android:name=".ui.objectives.AddObjectiveActivity" />
+        <activity android:name=".ui.tasks.TasksActivity" />
+        <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
+        <activity android:name=".ui.progression.ProgressionActivity" />
 
     </application>
 
