@@ -1,6 +1,7 @@
 package com.example.planexia.ui.modules;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.R;
+import com.example.planexia.data.PlanexiaRepository; // ← AJOUT
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.adapters.ModuleAdapter;
 import com.example.planexia.ui.objectives.ObjectivesActivity;
@@ -26,6 +28,8 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
     private ModuleAdapter moduleAdapter;
     private List<Module> moduleList;
     private ImageButton btnAddModule;
+    private PlanexiaRepository repository; // ← AJOUT
+    private long userId; // ← AJOUT
 
     private final ActivityResultLauncher<Intent> addOrEditModuleLauncher =
             registerForActivityResult(
@@ -40,16 +44,23 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
 
                             if (isEditMode && editPosition != -1) {
                                 Module module = moduleList.get(editPosition);
+                                // ← AJOUT : mettre à jour en DB
+                                repository.updateModule(module.getId(), name, coefficient, color);
                                 module.setName(name);
                                 module.setCoefficient(coefficient);
                                 module.setColor(color);
                                 moduleAdapter.notifyItemChanged(editPosition);
                                 Toast.makeText(this, "Module modifié", Toast.LENGTH_SHORT).show();
                             } else {
-                                int newId = moduleList.size() + 1;
-                                moduleList.add(new Module(newId, name, coefficient, color));
-                                moduleAdapter.notifyItemInserted(moduleList.size() - 1);
-                                Toast.makeText(this, "Module ajouté", Toast.LENGTH_SHORT).show();
+                                // ← AJOUT : ajouter en DB
+                                long newId = repository.addModule(userId, name, coefficient, color);
+                                if (newId != -1) {
+                                    moduleList.add(new Module((int) newId, name, coefficient, color));
+                                    moduleAdapter.notifyItemInserted(moduleList.size() - 1);
+                                    Toast.makeText(this, "Module ajouté", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(this, "Erreur lors de l'ajout", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
                     }
@@ -60,10 +71,18 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modules);
 
+        // ← AJOUT : init repository + userId temporaire
+        repository = new PlanexiaRepository(this);
+        SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
+        userId = prefs.getLong("user_id", 1); // 1 = temporaire jusqu'au login
+
         rvModules = findViewById(R.id.rvModules);
         btnAddModule = findViewById(R.id.btnAddModule);
 
-        moduleList = getFakeModules();
+        // ← CHANGEMENT : remplace getFakeModules()
+        moduleList = new ArrayList<>();
+        moduleList.addAll(repository.getModulesByUser(userId));
+
         moduleAdapter = new ModuleAdapter(moduleList, this);
         rvModules.setLayoutManager(new LinearLayoutManager(this));
         rvModules.setAdapter(moduleAdapter);
@@ -73,7 +92,7 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
             addOrEditModuleLauncher.launch(intent);
         });
 
-        // Bottom Navigation
+        // Bottom Navigation — inchangé
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_modules);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -93,13 +112,16 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         });
     }
 
-    private List<Module> getFakeModules() {
-        List<Module> list = new ArrayList<>();
-        list.add(new Module(1, "Mathématiques", 3, "#8B5CF6"));
-        list.add(new Module(2, "Physique", 2, "#4F8EF7"));
-        list.add(new Module(3, "Informatique", 4, "#10B981"));
-        return list;
+    // ← AJOUT : recharger au retour
+    @Override
+    protected void onResume() {
+        super.onResume();
+        moduleList.clear();
+        moduleList.addAll(repository.getModulesByUser(userId));
+        moduleAdapter.notifyDataSetChanged();
     }
+
+    // ← SUPPRIMÉ : getFakeModules()
 
     @Override
     public void onModuleClick(int position) {
@@ -114,6 +136,9 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
     @Override
     public void onDeleteClick(int position) {
         if (position != RecyclerView.NO_POSITION) {
+            // ← AJOUT : supprimer en DB
+            Module module = moduleList.get(position);
+            repository.deleteModule(module.getId());
             moduleList.remove(position);
             moduleAdapter.notifyItemRemoved(position);
             Toast.makeText(this, "Module supprimé", Toast.LENGTH_SHORT).show();

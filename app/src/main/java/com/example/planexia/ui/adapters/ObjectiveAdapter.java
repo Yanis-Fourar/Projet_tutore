@@ -1,3 +1,6 @@
+
+
+
 package com.example.planexia.ui.adapters;
 
 import android.content.res.ColorStateList;
@@ -21,16 +24,25 @@ public class ObjectiveAdapter extends RecyclerView.Adapter<ObjectiveAdapter.Obje
     private List<Objective> objectiveList;
     private String moduleColor;
     private OnObjectiveActionListener listener;
+    private OnObjectiveClickListener clickListener;
 
     public interface OnObjectiveActionListener {
         void onEditClick(int position);
         void onDeleteClick(int position);
     }
 
+    public interface OnObjectiveClickListener {
+        void onObjectiveClick(int position);
+    }
+
     public ObjectiveAdapter(List<Objective> objectiveList, String moduleColor, OnObjectiveActionListener listener) {
         this.objectiveList = objectiveList;
         this.moduleColor = moduleColor;
         this.listener = listener;
+    }
+
+    public void setOnObjectiveClickListener(OnObjectiveClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -58,7 +70,7 @@ public class ObjectiveAdapter extends RecyclerView.Adapter<ObjectiveAdapter.Obje
             );
         }
 
-        // Jours restants (FS4.3) — utilise getDueDate()
+        // Jours restants
         long days = objective.getDaysRemaining();
         if (days < 0) {
             holder.tvDaysRemaining.setText("En retard de " + Math.abs(days) + "j");
@@ -70,6 +82,11 @@ public class ObjectiveAdapter extends RecyclerView.Adapter<ObjectiveAdapter.Obje
             holder.tvDaysRemaining.setText("J-" + days);
             holder.tvDaysRemaining.setTextColor(Color.parseColor("#10B981"));
         }
+
+        // Clic sur la carte entière → ouvrir les tasks
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) clickListener.onObjectiveClick(holder.getAdapterPosition());
+        });
 
         holder.ivEdit.setOnClickListener(v -> {
             if (listener != null) listener.onEditClick(holder.getAdapterPosition());
@@ -89,11 +106,11 @@ public class ObjectiveAdapter extends RecyclerView.Adapter<ObjectiveAdapter.Obje
 
         public ObjectiveViewHolder(@NonNull View itemView) {
             super(itemView);
-            viewColor = itemView.findViewById(R.id.viewColor);
-            tvTitle = itemView.findViewById(R.id.tvTitle);
+            viewColor       = itemView.findViewById(R.id.viewColor);
+            tvTitle         = itemView.findViewById(R.id.tvTitle);
             tvDaysRemaining = itemView.findViewById(R.id.tvDaysRemaining);
-            ivEdit = itemView.findViewById(R.id.ivEdit);
-            ivDelete = itemView.findViewById(R.id.ivDelete);
+            ivEdit          = itemView.findViewById(R.id.ivEdit);
+            ivDelete        = itemView.findViewById(R.id.ivDelete);
         }
     }
 }
