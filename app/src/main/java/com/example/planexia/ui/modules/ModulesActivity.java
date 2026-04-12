@@ -17,6 +17,7 @@ import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.adapters.ModuleAdapter;
 import com.example.planexia.ui.objectives.ObjectivesActivity;
+import com.example.planexia.ui.progression.ProgressionActivity;
 import com.example.planexia.ui.tasks.TasksActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -72,7 +73,6 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modules);
 
-        // Récupérer userId depuis SharedPreferences
         SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
         userId = prefs.getLong("user_id", -1);
 
@@ -85,7 +85,6 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         rvModules.setLayoutManager(new LinearLayoutManager(this));
         rvModules.setAdapter(moduleAdapter);
 
-        // Charger les modules depuis la DB
         reloadModules();
 
         btnAddModule.setOnClickListener(v -> {
@@ -93,25 +92,24 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
             addOrEditModuleLauncher.launch(intent);
         });
 
-        // ✅ Bottom Navigation — IDs corrects qui correspondent à bottom_nav_menu.xml
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_matieres);
             bottomNav.setOnItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_matieres) {
-                    return true; // déjà sur cette page
+                    return true;
                 } else if (id == R.id.nav_taches) {
                     startActivity(new Intent(this, TasksActivity.class));
                     return true;
-                } else if (id == R.id.nav_planning) {
-                    Toast.makeText(this, "Planning — bientôt disponible", Toast.LENGTH_SHORT).show();
-                    return true;
                 } else if (id == R.id.nav_progression) {
-                    Toast.makeText(this, "Progression — bientôt disponible", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, ProgressionActivity.class));
+                    return true;
+                } else if (id == R.id.nav_planning) {
+                    Toast.makeText(this, "Planning bientôt disponible", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == R.id.nav_profil) {
-                    Toast.makeText(this, "Profil — bientôt disponible", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Profil bientôt disponible", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 return false;
@@ -122,15 +120,12 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
     @Override
     protected void onResume() {
         super.onResume();
-        // Recharger proprement sans duplication
         reloadModules();
     }
 
     private void reloadModules() {
         moduleList.clear();
-        if (userId != -1) {
-            moduleList.addAll(repository.getModulesByUser(userId));
-        }
+        if (userId != -1) moduleList.addAll(repository.getModulesByUser(userId));
         moduleAdapter.notifyDataSetChanged();
     }
 

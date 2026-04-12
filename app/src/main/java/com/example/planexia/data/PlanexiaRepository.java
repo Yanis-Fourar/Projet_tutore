@@ -274,6 +274,7 @@ public class PlanexiaRepository {
         return ids;
     }
 
+    // ---------- PROGRESSION ----------
     public int getObjectiveProgress(long objectiveId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor totalC = db.rawQuery(
@@ -298,29 +299,77 @@ public class PlanexiaRepository {
         return (int) Math.round((done * 100.0) / total);
     }
 
+    /** Progression globale de l'utilisateur en % */
     public int getGlobalProgress(long userId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String sqlTotal =
-                "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
+        int[] counts = getTotalAndDone(db, userId);
+        if (counts[0] == 0) return 0;
+        return (int) Math.round((counts[1] * 100.0) / counts[0]);
+    }
+
+    /** Nombre total de tâches complétées pour l'utilisateur */
+    public int getCompletedTasksCount(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        return getTotalAndDone(db, userId)[1];
+    }
+
+    /** Nombre total de tâches de l'utilisateur */
+    public int getTotalTasksCount(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        return getTotalAndDone(db, userId)[0];
+    }
+
+    private int[] getTotalAndDone(SQLiteDatabase db, long userId) {
+        String base =
+                " FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
                         " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
                         " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
-                        " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?;";
-        Cursor totalC = db.rawQuery(sqlTotal, new String[]{String.valueOf(userId)});
+                        " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?";
+
+        Cursor totalC = db.rawQuery("SELECT COUNT(*)" + base + ";", new String[]{String.valueOf(userId)});
         int total = 0;
         if (totalC.moveToFirst()) total = totalC.getInt(0);
         totalC.close();
-        if (total == 0) return 0;
+
+        Cursor doneC = db.rawQuery(
+                "SELECT COUNT(*)" + base + " AND t." + PlanexiaDatabaseHelper.C_IS_DONE + " = 1;",
+                new String[]{String.valueOf(userId)}
+        );
+        int done = 0;
+        if (doneC.moveToFirst()) done = doneC.getInt(0);
+        doneC.close();
+
+        return new int[]{total, done};
+    }
+
+    /**
+     * Retourne pour chaque module : [total tasks, done tasks]
+     * Utilisé par la page Progression pour afficher la barre par matière.
+     */
+    public int[] getProgressForModule(long moduleId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String sqlTotal =
+                "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
+                        " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
+                        " WHERE o." + PlanexiaDatabaseHelper.C_MODULE_ID + " = ?;";
+
+        Cursor totalC = db.rawQuery(sqlTotal, new String[]{String.valueOf(moduleId)});
+        int total = 0;
+        if (totalC.moveToFirst()) total = totalC.getInt(0);
+        totalC.close();
 
         String sqlDone =
                 "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
                         " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
-                        " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
-                        " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?" +
+                        " WHERE o." + PlanexiaDatabaseHelper.C_MODULE_ID + " = ?" +
                         " AND t." + PlanexiaDatabaseHelper.C_IS_DONE + " = 1;";
-        Cursor doneC = db.rawQuery(sqlDone, new String[]{String.valueOf(userId)});
+
+        Cursor doneC = db.rawQuery(sqlDone, new String[]{String.valueOf(moduleId)});
         int done = 0;
         if (doneC.moveToFirst()) done = doneC.getInt(0);
         doneC.close();
-        return (int) Math.round((done * 100.0) / total);
+
+        return new int[]{total, done};
     }
 }
