@@ -6,12 +6,16 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.planexia.R;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class AddObjectiveActivity extends AppCompatActivity {
 
@@ -19,7 +23,7 @@ public class AddObjectiveActivity extends AppCompatActivity {
     private TextView tvDeadlineValue;
     private Button btnPickDate, btnSave;
 
-    private String selectedDueDate = ""; // format yyyy-MM-dd — correspond à C_DUE_DATE
+    private String selectedDueDate = "";
     private boolean isEditMode = false;
     private int editPosition = -1;
 
@@ -33,6 +37,9 @@ public class AddObjectiveActivity extends AppCompatActivity {
         btnPickDate     = findViewById(R.id.btnPickDate);
         btnSave         = findViewById(R.id.btnSaveObjective);
 
+        // ← AJOUT : bouton retour
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         btnPickDate.setOnClickListener(v -> openDatePicker());
         btnSave.setOnClickListener(v -> saveObjective());
 
@@ -41,18 +48,20 @@ public class AddObjectiveActivity extends AppCompatActivity {
 
     private void openDatePicker() {
         Calendar cal = Calendar.getInstance();
-        new DatePickerDialog(
+
+        DatePickerDialog dialog = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> {
-                    // Stocke en yyyy-MM-dd pour la DB
                     selectedDueDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
-                    // Affiche en dd/MM/yyyy pour l'utilisateur
                     tvDeadlineValue.setText(String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year));
                 },
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),
                 cal.get(Calendar.DAY_OF_MONTH)
-        ).show();
+        );
+
+        dialog.getDatePicker().setMinDate(cal.getTimeInMillis());
+        dialog.show();
     }
 
     private void readEditDataIfNeeded() {
@@ -70,7 +79,6 @@ public class AddObjectiveActivity extends AppCompatActivity {
 
         if (dueDate != null && !dueDate.isEmpty()) {
             selectedDueDate = dueDate;
-            // Convertit yyyy-MM-dd → dd/MM/yyyy pour l'affichage
             String[] parts = dueDate.split("-");
             if (parts.length == 3) {
                 tvDeadlineValue.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
@@ -90,13 +98,30 @@ public class AddObjectiveActivity extends AppCompatActivity {
             return;
         }
         if (selectedDueDate.isEmpty()) {
-            tvDeadlineValue.setError("Choisissez une date");
+            Toast.makeText(this, "Choisissez une date limite", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date chosen = sdf.parse(selectedDueDate);
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            today.set(Calendar.MILLISECOND, 0);
+            if (chosen.before(today.getTime())) {
+                Toast.makeText(this, "La date doit être aujourd'hui ou dans le futur", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Date invalide", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Intent result = new Intent();
         result.putExtra(ObjectivesActivity.KEY_TITLE, title);
-        result.putExtra(ObjectivesActivity.KEY_DUE_DATE, selectedDueDate); // yyyy-MM-dd
+        result.putExtra(ObjectivesActivity.KEY_DUE_DATE, selectedDueDate);
         result.putExtra("edit_mode", isEditMode);
         result.putExtra("edit_position", editPosition);
         setResult(RESULT_OK, result);

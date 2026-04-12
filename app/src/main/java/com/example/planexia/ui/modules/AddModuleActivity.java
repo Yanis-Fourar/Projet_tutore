@@ -36,6 +36,9 @@ public class AddModuleActivity extends AppCompatActivity {
 
         btnSave = findViewById(R.id.btnSaveModule);
 
+        // ← AJOUT : bouton retour
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         colorBlue.setOnClickListener(v -> selectedColor = ViewColorSelector.BLUE);
         colorPurple.setOnClickListener(v -> selectedColor = ViewColorSelector.PURPLE);
         colorGreen.setOnClickListener(v -> selectedColor = ViewColorSelector.GREEN);
