@@ -105,13 +105,14 @@ public class PlanningActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_matieres) {
-                // TODO : naviguer vers ModulesActivity
+                startActivity(new android.content.Intent(this, com.example.planexia.ui.modules.ModulesActivity.class));
+                finish();
             } else if (id == R.id.nav_taches) {
-                // TODO : naviguer vers tâches globales
+                startActivity(new android.content.Intent(this, com.example.planexia.ui.tasks.TasksActivity.class));
+                finish();
             } else if (id == R.id.nav_progression) {
-                // TODO : naviguer vers progression
-            } else if (id == R.id.nav_profil) {
-                // TODO : naviguer vers ProfileActivity
+                startActivity(new android.content.Intent(this, com.example.planexia.ui.progression.ProgressionActivity.class));
+                finish();
             }
             return true;
         });

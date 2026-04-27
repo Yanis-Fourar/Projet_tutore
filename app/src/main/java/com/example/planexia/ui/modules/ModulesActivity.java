@@ -26,10 +26,13 @@ import java.util.List;
 
 public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.OnModuleActionListener {
 
+    private static final int FREE_MODULE_LIMIT = 3;
+
     private RecyclerView rvModules;
     private ModuleAdapter moduleAdapter;
     private List<Module> moduleList;
     private ImageButton btnAddModule;
+    private android.widget.TextView tvModulesCount;
     private PlanexiaRepository repository;
     private long userId;
 
@@ -57,6 +60,7 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
                                 if (newId != -1) {
                                     moduleList.add(new Module((int) newId, name, coefficient, color));
                                     moduleAdapter.notifyItemInserted(moduleList.size() - 1);
+                                    updateModulesCount();
                                     Toast.makeText(this, "Module ajouté", Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(this, "Erreur lors de l'ajout", Toast.LENGTH_SHORT).show();
@@ -75,8 +79,9 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
         userId = prefs.getLong("user_id", 1); // 1 = temporaire jusqu'au login
 
-        rvModules    = findViewById(R.id.rvModules);
-        btnAddModule = findViewById(R.id.btnAddModule);
+        rvModules      = findViewById(R.id.rvModules);
+        btnAddModule   = findViewById(R.id.btnAddModule);
+        tvModulesCount = findViewById(R.id.tvModulesCount);
 
         moduleList    = new ArrayList<>();
         moduleAdapter = new ModuleAdapter(moduleList, this);
@@ -104,7 +109,8 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
                     startActivity(new Intent(this, ProgressionActivity.class));
                     return true;
                 } else if (id == R.id.nav_planning) {
-                    Toast.makeText(this, "Planning bientôt disponible", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
+                    finish();
                     return true;
                 } else if (id == R.id.nav_profil) {
                     Toast.makeText(this, "Profil bientôt disponible", Toast.LENGTH_SHORT).show();
@@ -125,6 +131,13 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         moduleList.clear();
         moduleList.addAll(repository.getModulesByUser(userId));
         moduleAdapter.notifyDataSetChanged();
+        updateModulesCount();
+    }
+
+    private void updateModulesCount() {
+        if (tvModulesCount != null) {
+            tvModulesCount.setText(moduleList.size() + "/" + FREE_MODULE_LIMIT + " matières utilisées");
+        }
     }
 
     @Override
@@ -145,6 +158,7 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         repository.deleteModule(module.getId());
         moduleList.remove(position);
         moduleAdapter.notifyItemRemoved(position);
+        updateModulesCount();
         Toast.makeText(this, "Module supprimé", Toast.LENGTH_SHORT).show();
     }
 

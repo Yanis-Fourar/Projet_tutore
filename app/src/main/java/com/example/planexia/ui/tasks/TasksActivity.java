@@ -321,6 +321,10 @@ public class TasksActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ProgressionActivity.class));
                 finish();
                 return true;
+            } else if (id == R.id.nav_planning) {
+                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
+                finish();
+                return true;
             }
             return false;
         });
