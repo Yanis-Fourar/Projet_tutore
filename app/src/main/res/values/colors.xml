@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Couleurs principales Planexia -->
+    <color name="purple_primary">#5B2EE8</color>
+    <color name="purple_dark">#4A1BC8</color>
+    <color name="purple_light">#6A35F0</color>
+
+    <color name="orange_accent">#F5A623</color>
+    <color name="green_accent">#4CAF7D</color>
+    <color name="pink_accent">#E84B8A</color>
+    <color name="blue_accent">#2196F3</color>
+
+    <!-- Textes -->
+    <color name="text_primary">#1A1A2E</color>
+    <color name="text_secondary">#888888</color>
+    <color name="text_on_purple">#FFFFFF</color>
+
+    <!-- Fond -->
+    <color name="background">#F4F4FB</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Material Design (requis par certains thèmes) -->
+    <color name="purple_200">#BBAAFF</color>
+    <color name="purple_500">#5B2EE8</color>
+    <color name="purple_700">#4A1BC8</color>
+    <color name="teal_200">#80CBC4</color>
+    <color name="teal_700">#00796B</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>
