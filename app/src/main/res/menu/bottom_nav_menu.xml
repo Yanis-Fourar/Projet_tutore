@@ -3,27 +3,27 @@
 
     <item
         android:id="@+id/nav_matieres"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/ic_matieres"
         android:title="Matières" />
 
     <item
         android:id="@+id/nav_taches"
-        android:icon="@android:drawable/checkbox_on_background"
+        android:icon="@drawable/ic_taches"
         android:title="Tâches" />
 
     <item
         android:id="@+id/nav_planning"
-        android:icon="@android:drawable/ic_menu_today"
+        android:icon="@drawable/ic_planning"
         android:title="Planning" />
 
     <item
         android:id="@+id/nav_progression"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:icon="@drawable/ic_progression"
         android:title="Progression" />
 
     <item
         android:id="@+id/nav_profil"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_profil"
         android:title="Profil" />
 
 </menu>

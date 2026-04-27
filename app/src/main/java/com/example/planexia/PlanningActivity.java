@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.data.SessionManager;
-import com.example.planexia.data.Task;
+import com.example.planexia.model.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;

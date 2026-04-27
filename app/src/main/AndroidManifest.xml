@@ -11,21 +11,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
+
         <activity android:name=".PlanningActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".MainActivity" android:exported="true" />
+
+        <activity android:name=".ui.modules.ModulesActivity" />
+        <activity android:name=".ui.modules.AddModuleActivity" />
+        <activity android:name=".ui.objectives.ObjectivesActivity" />
+        <activity android:name=".ui.objectives.AddObjectiveActivity" />
+        <activity android:name=".ui.tasks.TasksActivity" />
+        <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
+        <activity android:name=".ui.progression.ProgressionActivity" />
+
     </application>
 
 </manifest>
