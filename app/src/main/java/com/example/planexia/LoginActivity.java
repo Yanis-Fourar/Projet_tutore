@@ -105,18 +105,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToDashboard() {
-        try {
-            Class<?> dashboardClass = Class.forName("com.example.planexia.ui.DashboardActivity");
-            Intent intent = new Intent(this, dashboardClass);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        } catch (ClassNotFoundException e) {
-            // DashboardActivity pas encore créée par les autres membres
-            Toast.makeText(this, "Connecté ! (Dashboard pas encore disponible)",
-                    Toast.LENGTH_LONG).show();
-            finish();
-        }
+        Intent intent = new Intent(this, PlanningActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override

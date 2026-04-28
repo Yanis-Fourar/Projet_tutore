@@ -12,14 +12,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
 
-        <activity android:name=".PlanningActivity" android:exported="true">
+        <!-- ===== AUTH FLOW ===== -->
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" android:exported="true" />
+        <activity android:name=".WelcomeActivity" android:exported="false" />
+        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
+
+        <!-- ===== APP PRINCIPALE ===== -->
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".PlanningActivity" android:exported="false" />
 
         <activity android:name=".ui.modules.ModulesActivity" />
         <activity android:name=".ui.modules.AddModuleActivity" />
@@ -28,6 +37,7 @@
         <activity android:name=".ui.tasks.TasksActivity" />
         <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
         <activity android:name=".ui.progression.ProgressionActivity" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
 
     </application>
 

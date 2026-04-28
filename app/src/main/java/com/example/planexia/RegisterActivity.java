@@ -110,7 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
         executor.execute(() -> {
             long result;
             try {
-                result = repository.createUser(email, hash);
+                result = repository.createUser(email, hash, pseudo, filiere, annee);
             } catch (android.database.sqlite.SQLiteConstraintException e) {
                 // Email déjà pris (contrainte UNIQUE sur users.email)
                 result = -1L;
@@ -134,17 +134,10 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void goToDashboard() {
-        try {
-            Class<?> dashboardClass = Class.forName("com.example.planexia.ui.DashboardActivity");
-            Intent intent = new Intent(this, dashboardClass);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        } catch (ClassNotFoundException e) {
-            Toast.makeText(this, "Compte créé ! (Dashboard pas encore disponible)",
-                    Toast.LENGTH_LONG).show();
-            finish();
-        }
+        Intent intent = new Intent(this, PlanningActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override

@@ -123,7 +123,11 @@ public class ProgressionActivity extends AppCompatActivity {
                 startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
                 finish();
                 return true;
-            }
+
+             } else if (id == R.id.nav_profil) {
+                startActivity(new android.content.Intent(this, com.example.planexia.ProfileActivity.class));
+                finish();
+             }
             return false;
         });
     }

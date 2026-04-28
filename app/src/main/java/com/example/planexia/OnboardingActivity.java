@@ -6,7 +6,6 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.planexia.R;
 import com.example.planexia.data.SessionManager;
 
 public class OnboardingActivity extends AppCompatActivity {
@@ -15,11 +14,12 @@ public class OnboardingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Si déjà connecté → aller au Dashboard directement
+        // Si déjà connecté → aller directement à l'app
         SessionManager session = new SessionManager(this);
         if (session.isLoggedIn()) {
-            //  DashboardActivity quand disponible
-
+            startActivity(new Intent(this, PlanningActivity.class));
+            finish();
+            return;
         }
 
         setContentView(R.layout.activity_onboarding);

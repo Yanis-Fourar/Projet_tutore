@@ -21,12 +21,15 @@ public class PlanexiaRepository {
     }
 
     // ---------- USERS ----------
-    public long createUser(String email, String password) {
+    public long createUser(String email, String password, String pseudo, String filiere, String annee) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(PlanexiaDatabaseHelper.C_EMAIL, email);
         values.put(PlanexiaDatabaseHelper.C_PASSWORD_HASH, password);
         values.put(PlanexiaDatabaseHelper.C_IS_PREMIUM, 0);
+        values.put(PlanexiaDatabaseHelper.C_PSEUDO, pseudo);
+        values.put(PlanexiaDatabaseHelper.C_FILIERE, filiere);
+        values.put(PlanexiaDatabaseHelper.C_ANNEE, annee);
         return db.insert(PlanexiaDatabaseHelper.T_USERS, null, values);
     }
 
@@ -43,6 +46,25 @@ public class PlanexiaRepository {
         if (c.moveToFirst()) userId = c.getLong(0);
         c.close();
         return userId;
+    }
+
+    public String[] getUserInfo(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(
+                PlanexiaDatabaseHelper.T_USERS,
+                new String[]{ PlanexiaDatabaseHelper.C_PSEUDO, PlanexiaDatabaseHelper.C_FILIERE, PlanexiaDatabaseHelper.C_ANNEE },
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{ String.valueOf(userId) },
+                null, null, null
+        );
+        String[] info = {"?", "?", "?"};
+        if (c.moveToFirst()) {
+            info[0] = c.getString(0); // pseudo
+            info[1] = c.getString(1); // filiere
+            info[2] = c.getString(2); // annee
+        }
+        c.close();
+        return info;
     }
 
     // ---------- MODULES ----------

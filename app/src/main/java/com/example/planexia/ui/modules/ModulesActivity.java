@@ -113,7 +113,8 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
                     finish();
                     return true;
                 } else if (id == R.id.nav_profil) {
-                    Toast.makeText(this, "Profil bientôt disponible", Toast.LENGTH_SHORT).show();
+                    startActivity(new android.content.Intent(this, com.example.planexia.ProfileActivity.class));
+                    finish();
                     return true;
                 }
                 return false;

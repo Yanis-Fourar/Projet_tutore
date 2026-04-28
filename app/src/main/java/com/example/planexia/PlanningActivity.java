@@ -41,7 +41,7 @@ public class PlanningActivity extends AppCompatActivity {
 
         // Utilisateur de test si aucune session active
         if (!session.isLoggedIn()) {
-            long userId = repository.createUser("test@planexia.com", "test");
+            long userId = repository.createUser("test@planexia.com", "test", "Test", "Informatique", "L1");
             if (userId == -1) {
                 userId = repository.login("test@planexia.com", "test");
             }
@@ -113,7 +113,10 @@ public class PlanningActivity extends AppCompatActivity {
             } else if (id == R.id.nav_progression) {
                 startActivity(new android.content.Intent(this, com.example.planexia.ui.progression.ProgressionActivity.class));
                 finish();
-            }
+            } else if (id == R.id.nav_profil) {
+            startActivity(new android.content.Intent(this, com.example.planexia.ProfileActivity.class));
+            finish();
+        }
             return true;
         });
     }
