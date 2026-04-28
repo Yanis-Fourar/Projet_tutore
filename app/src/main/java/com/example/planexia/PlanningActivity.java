@@ -64,7 +64,7 @@ public class PlanningActivity extends AppCompatActivity {
         btnJour          = findViewById(R.id.btnJour);
         btnSemaine       = findViewById(R.id.btnSemaine);
         recyclerPlanning = findViewById(R.id.recyclerPlanning);
-        bottomNav        = findViewById(R.id.bottomNav);
+        bottomNav        = findViewById(R.id.bottomNavigationView);
 
         Button btnPremium = findViewById(R.id.btnDebloquerPremium);
         Button btnIA      = findViewById(R.id.btnDecouvrirIA);

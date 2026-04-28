@@ -64,6 +64,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         } else {
             holder.tvTaskTitle.setPaintFlags(holder.tvTaskTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             holder.tvTaskTitle.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#1A1A2E"));
+            holder.itemView.setBackgroundResource(isLate ? R.drawable.card_border_red : R.drawable.card_normal);
         }
 
         // --- Sous-titre : Module • ressource ---
