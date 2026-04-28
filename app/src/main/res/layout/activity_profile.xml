@@ -29,7 +29,7 @@
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/purple_primary">
+                app:cardBackgroundColor="#6C3FC5">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -107,7 +107,7 @@
                         android:text="+ Passer Premium"
                         android:textColor="#FFFFFF"
                         android:textSize="13sp"
-                        android:background="@drawable/bg_button_outline"
+                        android:background="#bfafde"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         style="?android:attr/borderlessButtonStyle" />
@@ -127,6 +127,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_ia_banner"
                     android:orientation="vertical"
                     android:padding="16dp">
 

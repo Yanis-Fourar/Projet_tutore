@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:ignore="ProtectedPermissions"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -38,6 +43,14 @@
         <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
         <activity android:name=".ui.progression.ProgressionActivity" />
         <activity android:name=".ProfileActivity" android:exported="false" />
+
+        <!-- Notifications -->
+        <activity android:name=".notifications.NotificationsActivity" android:exported="false"/>
+        <receiver android:name=".notifications.TaskReminderReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

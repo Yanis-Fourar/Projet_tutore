@@ -26,11 +26,16 @@ import com.example.planexia.data.PlanexiaDatabaseHelper;
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Task;
 import com.example.planexia.ui.modules.ModulesActivity;
+import com.example.planexia.ui.progression.ProgressionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ObjectiveDetailActivity extends AppCompatActivity {
 
@@ -159,10 +164,20 @@ public class ObjectiveDetailActivity extends AppCompatActivity {
         Button btnCancel     = dialog.findViewById(R.id.btnDialogCancel);
         Button btnAdd        = dialog.findViewById(R.id.btnDialogAdd);
 
-        // Stocker la date choisie (format YYYY-MM-DD)
         final String[] selectedDate = {null};
 
-        // Clic sur le bouton calendrier → ouvre DatePickerDialog
+        // ✅ Récupérer la date limite de l'objectif pour bloquer le DatePicker
+        String objectiveDueDate = getObjectiveDueDate();
+        long objectiveMaxMillis = Long.MAX_VALUE;
+        if (objectiveDueDate != null) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                Date d = sdf.parse(objectiveDueDate);
+                if (d != null) objectiveMaxMillis = d.getTime();
+            } catch (ParseException ignored) {}
+        }
+        final long maxDateMillis = objectiveMaxMillis;
+
         btnDate.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
             int year  = cal.get(Calendar.YEAR);
@@ -172,23 +187,24 @@ public class ObjectiveDetailActivity extends AppCompatActivity {
             DatePickerDialog datePicker = new DatePickerDialog(
                     this,
                     (view, y, m, d) -> {
-                        // Sauvegarder au format YYYY-MM-DD
                         selectedDate[0] = String.format("%04d-%02d-%02d", y, m + 1, d);
-
-                        // Afficher de façon lisible : "15 juin 2025"
                         String[] mois = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
                                 "juil.", "août", "sep.", "oct.", "nov.", "déc."};
                         tvDateValue.setText(d + " " + mois[m] + " " + y);
                         tvDateValue.setTextColor(Color.parseColor("#1F1F1F"));
-
-                        // Remettre le fond normal (enlever l'erreur rouge si elle était là)
                         btnDate.setBackgroundResource(R.drawable.bg_edit_text);
                     },
                     year, month, day
             );
 
-            // Ne pas permettre de choisir une date passée
+            // ✅ Date minimum = aujourd'hui
             datePicker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+
+            // ✅ Date maximum = date limite de l'objectif (si elle existe)
+            if (maxDateMillis != Long.MAX_VALUE) {
+                datePicker.getDatePicker().setMaxDate(maxDateMillis);
+            }
+
             datePicker.show();
         });
 
@@ -197,27 +213,20 @@ public class ObjectiveDetailActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(v -> {
             String title    = etTitle.getText().toString().trim();
             String resource = etResource.getText().toString().trim();
-
             boolean hasError = false;
 
-            // Vérifier le titre
             if (TextUtils.isEmpty(title)) {
                 etTitle.setError("Le titre est obligatoire");
                 hasError = true;
             }
-
-            // Vérifier la date — OBLIGATOIRE
             if (selectedDate[0] == null) {
-                // Mettre le fond en rouge pour signaler l'erreur
                 btnDate.setBackgroundResource(R.drawable.circle_outline_red);
                 tvDateValue.setHint("⚠ Veuillez choisir une date");
                 hasError = true;
             }
-
             if (hasError) return;
 
             String resourceToSave = TextUtils.isEmpty(resource) ? null : resource;
-
             long newId = repository.addTask(objectiveId, title, selectedDate[0], resourceToSave);
             if (newId != -1) {
                 taskList.add(new Task(newId, title, false, selectedDate[0], resourceToSave));
@@ -232,19 +241,51 @@ public class ObjectiveDetailActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /** Récupère la date limite (due_date) de l'objectif courant */
+    private String getObjectiveDueDate() {
+        try {
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            Cursor c = db.query(
+                    PlanexiaDatabaseHelper.T_OBJECTIVES,
+                    new String[]{PlanexiaDatabaseHelper.C_DUE_DATE},
+                    PlanexiaDatabaseHelper.C_ID + " = ?",
+                    new String[]{String.valueOf(objectiveId)},
+                    null, null, null
+            );
+            String dueDate = null;
+            if (c.moveToFirst()) dueDate = c.getString(0);
+            c.close();
+            return dueDate;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void setupBottomNav() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         if (bottomNav == null) return;
+        bottomNav.setSelectedItemId(R.id.nav_taches);
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_taches) {
-                startActivity(new Intent(this, TasksActivity.class));
-                return true;
-            } else if (id == R.id.nav_matieres) {
+            if (id == R.id.nav_taches) return true;
+            else if (id == R.id.nav_matieres) {
                 startActivity(new Intent(this, ModulesActivity.class));
                 finish();
                 return true;
+            } else if (id == R.id.nav_progression) {
+                startActivity(new Intent(this, ProgressionActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_planning) {
+                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_profil) {
+                startActivity(new android.content.Intent(this, com.example.planexia.ProfileActivity.class));
+                finish();
+                return true;
             }
+
             return false;
         });
     }

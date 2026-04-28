@@ -64,7 +64,7 @@
             android:layout_height="52dp"
             android:text="Se connecter"
             android:textAllCaps="false"
-            android:textColor="#6C2BD9"
+            android:textColor="@android:color/white"
             android:background="@drawable/bg_button_outline"
             android:layout_marginTop="12dp" />
 

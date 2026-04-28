@@ -67,7 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Paramètres à venir", Toast.LENGTH_SHORT).show());
 
         rowNotifications.setOnClickListener(v ->
-                Toast.makeText(this, "Notifications à venir", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, com.example.planexia.notifications.NotificationsActivity.class)));
 
         rowAide.setOnClickListener(v ->
                 Toast.makeText(this, "Aide & Support à venir", Toast.LENGTH_SHORT).show());

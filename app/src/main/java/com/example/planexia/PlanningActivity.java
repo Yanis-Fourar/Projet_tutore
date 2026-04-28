@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+
 public class PlanningActivity extends AppCompatActivity {
 
     private Button btnJour;
@@ -33,6 +34,7 @@ public class PlanningActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planning);
 
