@@ -238,6 +238,7 @@ public class PlanexiaRepository {
                         ", t." + PlanexiaDatabaseHelper.C_RESOURCE_TEXT +
                         ", m." + PlanexiaDatabaseHelper.C_NAME +
                         ", m." + PlanexiaDatabaseHelper.C_COLOR +
+                        ", o." + PlanexiaDatabaseHelper.C_TITLE +
                         " FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
                         " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
                         " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
@@ -248,7 +249,7 @@ public class PlanexiaRepository {
         while (c.moveToNext()) {
             tasks.add(new Task(
                     c.getLong(0), c.getString(1), c.getInt(2) == 1,
-                    c.getString(3), c.getString(4), c.getString(5), c.getString(6)
+                    c.getString(3), c.getString(4), c.getString(5), c.getString(6), c.getString(7)
             ));
         }
         c.close();
@@ -266,6 +267,7 @@ public class PlanexiaRepository {
                         ", t." + PlanexiaDatabaseHelper.C_RESOURCE_TEXT +
                         ", m." + PlanexiaDatabaseHelper.C_NAME +
                         ", m." + PlanexiaDatabaseHelper.C_COLOR +
+                        ", o." + PlanexiaDatabaseHelper.C_TITLE +
                         " FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
                         " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
                         " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
@@ -275,7 +277,7 @@ public class PlanexiaRepository {
         while (c.moveToNext()) {
             tasks.add(new Task(
                     c.getLong(0), c.getString(1), c.getInt(2) == 1,
-                    c.getString(3), c.getString(4), c.getString(5), c.getString(6)
+                    c.getString(3), c.getString(4), c.getString(5), c.getString(6), c.getString(7)
             ));
         }
         c.close();

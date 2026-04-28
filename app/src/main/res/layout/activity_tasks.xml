@@ -237,9 +237,10 @@
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btnExportPdf"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
-                        android:text="Découvrir"
+                        android:text="Exporter"
                         android:textColor="#FFFFFF"
                         android:textSize="12sp"
                         android:backgroundTint="#6C3FC5"

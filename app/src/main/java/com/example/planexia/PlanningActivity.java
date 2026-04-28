@@ -132,8 +132,16 @@ public class PlanningActivity extends AppCompatActivity {
         String today = getTodayString();
         List<PlanningTaskAdapter.PlanningTask> result = new ArrayList<>();
 
+        // Calcule le décalage vers le lundi de la semaine courante
+        Calendar cal = Calendar.getInstance();
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK); // 1=Dim, 2=Lun, ..., 7=Sam
+        int daysToMonday = (dayOfWeek == Calendar.SUNDAY) ? -6 : (Calendar.MONDAY - dayOfWeek);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         for (int i = 0; i < 7; i++) {
-            String date = getDateString(i);
+            Calendar dayCal = Calendar.getInstance();
+            dayCal.add(Calendar.DAY_OF_YEAR, daysToMonday + i);
+            String date = sdf.format(dayCal.getTime());
             List<Task> tasks = repository.getTasksForDateWithModule(session.getUserId(), date);
             result.addAll(toPlanning(tasks, today));
         }
@@ -157,6 +165,7 @@ public class PlanningActivity extends AppCompatActivity {
 
             result.add(new PlanningTaskAdapter.PlanningTask(
                     t.getTitle(),
+                    t.getObjectiveName() != null ? t.getObjectiveName() : "",
                     t.getModuleName() != null ? t.getModuleName() : "",
                     0,
                     label,

@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -16,6 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.planexia.util.PdfExporter;
+
+import java.util.concurrent.Executors;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -70,6 +77,9 @@ public class TasksActivity extends AppCompatActivity {
         CardView btnAdd = findViewById(R.id.btnAddTask);
         if (btnAdd != null) btnAdd.setOnClickListener(v -> showAddTaskDialog());
 
+        Button btnExport = findViewById(R.id.btnExportPdf);
+        if (btnExport != null) btnExport.setOnClickListener(v -> exportPdf());
+
         allTasks       = new ArrayList<>();
         displayedTasks = new ArrayList<>();
 
@@ -108,6 +118,28 @@ public class TasksActivity extends AppCompatActivity {
         if (userId != -1) allTasks.addAll(repository.getAllTasksForUser(userId));
         applyFilter(currentFilter);
         updateCounts();
+    }
+
+    // ── EXPORT PDF ───────────────────────────────────────────
+
+    private void exportPdf() {
+        if (allTasks.isEmpty()) {
+            Toast.makeText(this, "Aucune tâche à exporter", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(this, "Génération du PDF…", Toast.LENGTH_SHORT).show();
+        Handler handler = new Handler(Looper.getMainLooper());
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                Uri uri = PdfExporter.export(this, allTasks);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, "application/pdf");
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                handler.post(() -> startActivity(Intent.createChooser(intent, "Ouvrir le PDF")));
+            } catch (Exception e) {
+                handler.post(() -> Toast.makeText(this, "Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
     }
 
     // ── DIALOG 3 ÉTAPES ──────────────────────────────────────
