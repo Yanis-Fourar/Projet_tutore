@@ -12,7 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
 
-        <!-- Premier écran lancé : splash violet "Commencer" -->
         <activity
             android:name=".OnboardingActivity"
             android:exported="true">
@@ -22,16 +21,18 @@
             </intent-filter>
         </activity>
 
-        <!-- Auth -->
         <activity android:name=".WelcomeActivity"  android:exported="false" />
         <activity android:name=".LoginActivity"    android:exported="false" />
         <activity android:name=".RegisterActivity" android:exported="false" />
 
-        <!-- Modules / Objectifs (collègue) -->
         <activity android:name=".ui.modules.ModulesActivity"         android:exported="false" />
         <activity android:name=".ui.modules.AddModuleActivity"       android:exported="false" />
         <activity android:name=".ui.objectives.ObjectivesActivity"   android:exported="false" />
         <activity android:name=".ui.objectives.AddObjectiveActivity" android:exported="false" />
+        <activity android:name=".ui.tasks.TasksActivity"             android:exported="false" />
+        <activity android:name=".ui.tasks.ObjectiveDetailActivity"   android:exported="false" />
+        <activity android:name=".ui.progression.ProgressionActivity" android:exported="false" />
+        <activity android:name=".PlanningActivity"                   android:exported="false" />
 
     </application>
 

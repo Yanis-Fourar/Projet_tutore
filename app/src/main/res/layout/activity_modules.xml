@@ -12,7 +12,7 @@
     <View
         android:id="@+id/headerBackground"
         android:layout_width="0dp"
-        android:layout_height="110dp"
+        android:layout_height="48dp"
         android:background="@drawable/bg_modules_header"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,6 +66,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_ia_banner"
             android:orientation="horizontal"
             android:padding="16dp"
             android:gravity="center_vertical">
@@ -77,9 +78,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvModulesCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2/3 matières utilisées"
+                    android:text="0/3 matières utilisées"
                     android:textStyle="bold"
                     android:textColor="#1F1F1F"
                     android:textSize="14sp" />

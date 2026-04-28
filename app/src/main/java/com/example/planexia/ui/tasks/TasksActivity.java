@@ -57,15 +57,15 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
-        SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", -1);
+
+        userId = new com.example.planexia.data.SessionManager(this).getUserId();
 
         repository = new PlanexiaRepository(this);
 
         recyclerView = findViewById(R.id.recyclerViewTasks);
         tvTodo       = findViewById(R.id.tvTodoCount);
         tvDone       = findViewById(R.id.tvDoneCount);
-        tvSubtitle   = findViewById(R.id.tvSubtitle);
+
 
         CardView btnAdd = findViewById(R.id.btnAddTask);
         if (btnAdd != null) btnAdd.setOnClickListener(v -> showAddTaskDialog());
@@ -319,6 +319,10 @@ public class TasksActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.nav_progression) {
                 startActivity(new Intent(this, ProgressionActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_planning) {
+                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
                 finish();
                 return true;
             }

@@ -32,8 +32,8 @@ public class ProgressionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progression);
 
-        SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", -1);
+
+        userId = new com.example.planexia.data.SessionManager(this).getUserId();
 
         repository = new PlanexiaRepository(this);
 
@@ -57,12 +57,12 @@ public class ProgressionActivity extends AppCompatActivity {
         TextView tvProgress  = findViewById(R.id.tvGlobalPercent);
         TextView tvDoneTasks = findViewById(R.id.tvDoneTasksCount);
         TextView tvTotal     = findViewById(R.id.tvTotalTasksCount);
-        ProgressBar pbGlobal = findViewById(R.id.pbGlobal);
+
 
         if (tvProgress  != null) tvProgress.setText(globalProgress + "%");
         if (tvDoneTasks != null) tvDoneTasks.setText(String.valueOf(doneTasks));
         if (tvTotal     != null) tvTotal.setText(totalTasks + " tâches");
-        if (pbGlobal    != null) pbGlobal.setProgress(globalProgress);
+
 
         LinearLayout containerModules = findViewById(R.id.containerModules);
         if (containerModules == null) return;
@@ -117,6 +117,10 @@ public class ProgressionActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.nav_taches) {
                 startActivity(new Intent(this, TasksActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_planning) {
+                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
                 finish();
                 return true;
             }
