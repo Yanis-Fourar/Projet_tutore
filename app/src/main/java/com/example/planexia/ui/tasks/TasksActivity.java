@@ -316,10 +316,7 @@ public class TasksActivity extends AppCompatActivity {
         Button btnCancel     = dialog.findViewById(R.id.btnDialogCancel);
         Button btnAdd        = dialog.findViewById(R.id.btnDialogAdd);
 
-        // Changer le libellé du bouton
         btnAdd.setText("Modifier");
-
-        // Pré-remplir les champs avec les valeurs actuelles
         etTitle.setText(task.getTitle());
         if (!android.text.TextUtils.isEmpty(task.getResourceText())) {
             etResource.setText(task.getResourceText());
@@ -340,6 +337,21 @@ public class TasksActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         }
 
+        // Récupérer la date limite de l'objectif parent pour bloquer le DatePicker
+        long maxDateMillis = Long.MAX_VALUE;
+        String objectiveDueDate = repository.getObjectiveDueDateForTask(task.getId());
+        if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
+            try {
+                String[] parts = objectiveDueDate.split("-");
+                Calendar calMax = Calendar.getInstance();
+                calMax.set(Integer.parseInt(parts[0]),
+                        Integer.parseInt(parts[1]) - 1,
+                        Integer.parseInt(parts[2]), 23, 59, 59);
+                maxDateMillis = calMax.getTimeInMillis();
+            } catch (Exception ignored) {}
+        }
+        final long finalMaxDateMillis = maxDateMillis;
+
         btnDate.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
             if (selectedDate[0] != null && !selectedDate[0].isEmpty()) {
@@ -359,6 +371,9 @@ public class TasksActivity extends AppCompatActivity {
                 btnDate.setBackgroundResource(R.drawable.bg_edit_text);
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
             picker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            if (finalMaxDateMillis != Long.MAX_VALUE) {
+                picker.getDatePicker().setMaxDate(finalMaxDateMillis);
+            }
             picker.show();
         });
 

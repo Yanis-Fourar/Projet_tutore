@@ -288,6 +288,21 @@ public class ObjectiveDetailActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         }
 
+        // Récupérer la date limite de l'objectif pour bloquer le DatePicker
+        long maxDateMillis = Long.MAX_VALUE;
+        String objectiveDueDate = getObjectiveDueDate();
+        if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
+            try {
+                String[] parts = objectiveDueDate.split("-");
+                Calendar calMax = Calendar.getInstance();
+                calMax.set(Integer.parseInt(parts[0]),
+                        Integer.parseInt(parts[1]) - 1,
+                        Integer.parseInt(parts[2]), 23, 59, 59);
+                maxDateMillis = calMax.getTimeInMillis();
+            } catch (Exception ignored) {}
+        }
+        final long finalMaxDateMillis = maxDateMillis;
+
         btnDate.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
             if (selectedDate[0] != null) {
@@ -305,6 +320,9 @@ public class ObjectiveDetailActivity extends AppCompatActivity {
                 btnDate.setBackgroundResource(R.drawable.bg_edit_text);
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
             picker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            if (finalMaxDateMillis != Long.MAX_VALUE) {
+                picker.getDatePicker().setMaxDate(finalMaxDateMillis);
+            }
             picker.show();
         });
 

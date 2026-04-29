@@ -249,6 +249,21 @@ public class PlanexiaRepository {
         );
     }
 
+    /** Retourne la due_date de l'objectif parent d'une tâche, ou null si introuvable. */
+    public String getObjectiveDueDateForTask(long taskId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT o." + PlanexiaDatabaseHelper.C_DUE_DATE +
+                " FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
+                " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID +
+                " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
+                " WHERE t." + PlanexiaDatabaseHelper.C_ID + " = ?";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(taskId)});
+        String dueDate = null;
+        if (c.moveToFirst()) dueDate = c.getString(0);
+        c.close();
+        return dueDate;
+    }
+
     public List<Task> getTasksByObjective(long objectiveId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(

@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import com.google.android.material.card.MaterialCardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.R;
@@ -73,6 +74,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 && !today.isEmpty()
                 && dueDate.compareTo(today) < 0;
 
+        // --- Fond transparent sur itemView pour éviter la double bordure ---
+        holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+
         // --- Titre ---
         holder.tvTaskTitle.setText(task.getTitle());
         if (task.isDone()) {
@@ -81,7 +85,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         } else {
             holder.tvTaskTitle.setPaintFlags(holder.tvTaskTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             holder.tvTaskTitle.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#1A1A2E"));
-            holder.itemView.setBackgroundResource(isLate ? R.drawable.card_border_red : R.drawable.card_normal);
+        }
+
+        // --- Bordure uniquement sur la CardView ---
+        if (holder.cardTask != null) {
+            if (isLate && !task.isDone()) {
+                holder.cardTask.setCardBackgroundColor(Color.parseColor("#FFF5F5"));
+                holder.cardTask.setStrokeColor(Color.parseColor("#F44336"));
+                holder.cardTask.setStrokeWidth(4);
+            } else {
+                holder.cardTask.setCardBackgroundColor(Color.parseColor("#FFFFFF"));
+                holder.cardTask.setStrokeWidth(0);
+            }
         }
 
         // --- Sous-titre : Module • ressource ---
@@ -134,16 +149,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 .inflate(R.layout.bottom_sheet_task_options, null);
         sheet.setContentView(sheetView);
 
-        // Fond arrondi transparent sous le sheet
         if (sheet.getWindow() != null) {
             sheet.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        // Titre de la tâche
         TextView tvTitle = sheetView.findViewById(R.id.tvBottomSheetTaskTitle);
         if (tvTitle != null) tvTitle.setText(task.getTitle());
 
-        // Bouton Modifier
         LinearLayout btnEdit = sheetView.findViewById(R.id.btnBottomSheetEdit);
         if (btnEdit != null) {
             btnEdit.setOnClickListener(v -> {
@@ -152,7 +164,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             });
         }
 
-        // Bouton Supprimer
         LinearLayout btnDelete = sheetView.findViewById(R.id.btnBottomSheetDelete);
         if (btnDelete != null) {
             btnDelete.setOnClickListener(v -> {
@@ -173,6 +184,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         TextView tvTaskTitle;
         TextView tvTaskSubtitle;
         ImageView ivChronoBadge;
+        MaterialCardView cardTask;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -181,6 +193,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             tvTaskTitle      = itemView.findViewById(R.id.tvTaskTitle);
             tvTaskSubtitle   = itemView.findViewById(R.id.tvTaskSubtitle);
             ivChronoBadge    = itemView.findViewById(R.id.ivChronoBadge);
+            cardTask         = itemView.findViewById(R.id.cardTask);
         }
     }
 }
