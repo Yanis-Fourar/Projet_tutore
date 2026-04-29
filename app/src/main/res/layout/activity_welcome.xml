@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F7F7FB"
@@ -10,21 +9,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="48dp"
-        android:paddingBottom="48dp">
+        android:paddingTop="24dp"
+        android:paddingBottom="32dp">
 
-        <!-- Logo -->
+        <!-- Bouton retour (en haut à gauche) -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_purple_btn"
+            android:src="@drawable/ic_arrow_back"
+            android:padding="10dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="Retour" />
+
+        <!-- Logo centré -->
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/bg_logo_square"
-            android:src="@drawable/ic_book"
-            android:padding="16dp"
-            android:layout_marginTop="120dp"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:background="@drawable/book"
+            android:padding="18dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
             android:contentDescription="Logo Planexia" />
 
         <!-- Titre -->
@@ -35,7 +44,8 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#1F1F1F"
-            android:layout_marginTop="32dp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp" />
 
         <!-- Sous-titre -->
         <TextView
@@ -44,29 +54,42 @@
             android:text="Commence ton parcours d'apprentissage"
             android:textSize="14sp"
             android:textColor="#777777"
-            android:layout_marginTop="8dp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="48dp" />
 
-        <!-- Bouton Créer un compte -->
+        <!-- Bouton "Créer un compte" avec icône personne+ -->
         <Button
             android:id="@+id/btnGoRegister"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="56dp"
             android:text="Créer un compte"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:background="@drawable/bg_save_button"
-            android:layout_marginTop="48dp" />
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_gradient"
+            android:drawableStart="@drawable/ic_person_add"
+            android:drawablePadding="10dp"
+            android:paddingStart="80dp"
+            android:paddingEnd="80dp" />
 
-        <!-- Bouton Se connecter -->
+        <!-- Bouton "Se connecter" outline avec icône login -->
         <Button
             android:id="@+id/btnGoLogin"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="56dp"
             android:text="Se connecter"
             android:textAllCaps="false"
-            android:textColor="#6C2BD9"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
             android:background="@drawable/bg_button_outline"
-            android:layout_marginTop="12dp" />
+            android:drawableStart="@drawable/ic_login"
+            android:drawablePadding="10dp"
+            android:paddingStart="80dp"
+            android:paddingEnd="80dp"
+            android:layout_marginTop="14dp" />
 
         <!-- Mention légale -->
         <TextView
@@ -76,7 +99,10 @@
             android:textSize="11sp"
             android:textColor="#999999"
             android:gravity="center"
-            android:layout_marginTop="24dp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
 
     </LinearLayout>
 </ScrollView>
