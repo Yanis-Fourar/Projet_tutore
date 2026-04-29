@@ -7,12 +7,14 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.planexia.data.SessionManager;
+import com.example.planexia.notifications.NotificationHelper;
 
 public class OnboardingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        NotificationHelper.createNotificationChannels(this);
 
         // Si déjà connecté → aller directement à l'app
         SessionManager session = new SessionManager(this);

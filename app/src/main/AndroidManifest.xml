@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:ignore="ProtectedPermissions"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
 
+        <!-- Premier écran lancé au démarrage -->
         <activity
             android:name=".OnboardingActivity"
             android:exported="true">
@@ -21,10 +27,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".WelcomeActivity"  android:exported="false" />
-        <activity android:name=".LoginActivity"    android:exported="false" />
-        <activity android:name=".RegisterActivity" android:exported="false" />
+        <!-- Auth -->
+        <activity android:name=".WelcomeActivity"  android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".LoginActivity"    android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".RegisterActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
 
+        <!-- Modules / Objectifs / Tâches / Progression -->
         <activity android:name=".ui.modules.ModulesActivity"         android:exported="false" />
         <activity android:name=".ui.modules.AddModuleActivity"       android:exported="false" />
         <activity android:name=".ui.objectives.ObjectivesActivity"   android:exported="false" />
@@ -33,7 +41,18 @@
         <activity android:name=".ui.tasks.ObjectiveDetailActivity"   android:exported="false" />
         <activity android:name=".ui.progression.ProgressionActivity" android:exported="false" />
         <activity android:name=".PlanningActivity"                   android:exported="false" />
+        <activity android:name=".notifications.NotificationsActivity" android:exported="false" />
+
+        <!-- Receiver pour les notifications -->
+        <receiver
+            android:name=".notifications.TaskReminderReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
     </application>
+
 
 </manifest>

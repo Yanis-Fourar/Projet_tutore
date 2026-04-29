@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.data.SessionManager;
+import com.example.planexia.notifications.NotificationHelper;
 import com.example.planexia.utils.PasswordUtils;
 
 import java.util.concurrent.ExecutorService;
@@ -110,8 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
         executor.execute(() -> {
             long result;
             try {
-                result = repository
-                        .createUser(email, hash, pseudo, filiere, annee);
+                result = repository.createUser(email, hash, pseudo, filiere, annee);
             } catch (android.database.sqlite.SQLiteConstraintException e) {
                 // Email déjà pris (contrainte UNIQUE sur users.email)
                 result = -1L;
@@ -122,6 +122,9 @@ public class RegisterActivity extends AppCompatActivity {
                 btnRegister.setEnabled(true);
                 if (finalResult > 0) {
                     sessionManager.saveUserId(finalResult);
+                    // ✅ Notification de bienvenue
+                    NotificationHelper.createNotificationChannels(this);
+                    NotificationHelper.sendWelcomeNotification(this, pseudo);
                     Toast.makeText(this, "Compte créé avec succès",
                             Toast.LENGTH_SHORT).show();
                     goToDashboard();

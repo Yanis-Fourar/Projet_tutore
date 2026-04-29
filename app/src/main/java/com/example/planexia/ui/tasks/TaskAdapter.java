@@ -7,13 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import com.google.android.material.card.MaterialCardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.R;
 import com.example.planexia.model.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,13 +27,28 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         void onChecked(long taskId, boolean isDone);
     }
 
+    public interface OnTaskEditListener {
+        void onEdit(Task task);
+    }
+
+    public interface OnTaskDeleteListener {
+        void onDelete(long taskId);
+    }
+
     private final List<Task> taskList;
-    private final OnTaskCheckedListener listener;
+    private final OnTaskCheckedListener checkedListener;
+    private final OnTaskEditListener editListener;
+    private final OnTaskDeleteListener deleteListener;
     private final String today;
 
-    public TaskAdapter(List<Task> taskList, OnTaskCheckedListener listener) {
-        this.taskList = taskList;
-        this.listener = listener;
+    public TaskAdapter(List<Task> taskList,
+                       OnTaskCheckedListener checkedListener,
+                       OnTaskEditListener editListener,
+                       OnTaskDeleteListener deleteListener) {
+        this.taskList        = taskList;
+        this.checkedListener = checkedListener;
+        this.editListener    = editListener;
+        this.deleteListener  = deleteListener;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             this.today = LocalDate.now().toString();
         } else {
@@ -56,6 +74,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 && !today.isEmpty()
                 && dueDate.compareTo(today) < 0;
 
+        // --- Fond transparent sur itemView pour éviter la double bordure ---
+        holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+
         // --- Titre ---
         holder.tvTaskTitle.setText(task.getTitle());
         if (task.isDone()) {
@@ -64,7 +85,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         } else {
             holder.tvTaskTitle.setPaintFlags(holder.tvTaskTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             holder.tvTaskTitle.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#1A1A2E"));
-            holder.itemView.setBackgroundResource(isLate ? R.drawable.card_border_red : R.drawable.card_normal);
+        }
+
+        // --- Bordure uniquement sur la CardView ---
+        if (holder.cardTask != null) {
+            if (isLate && !task.isDone()) {
+                holder.cardTask.setCardBackgroundColor(Color.parseColor("#FFF5F5"));
+                holder.cardTask.setStrokeColor(Color.parseColor("#F44336"));
+                holder.cardTask.setStrokeWidth(4);
+            } else {
+                holder.cardTask.setCardBackgroundColor(Color.parseColor("#FFFFFF"));
+                holder.cardTask.setStrokeWidth(0);
+            }
         }
 
         // --- Sous-titre : Module • ressource ---
@@ -82,7 +114,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.viewColorBar.setBackgroundColor(Color.parseColor("#7B1FA2"));
         }
 
-        // --- Icône chrono (grisée si fait, rouge si en retard) ---
+        // --- Icône chrono ---
         if (task.isDone()) {
             holder.ivChronoBadge.setColorFilter(Color.parseColor("#BBBBBB"));
         } else if (isLate) {
@@ -91,16 +123,56 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.ivChronoBadge.setColorFilter(Color.parseColor("#CCCCCC"));
         }
 
-        // --- Clic sur la carte = cocher/décocher ---
+        // --- Clic = cocher/décocher ---
         holder.itemView.setOnClickListener(v -> {
             boolean newState = !task.isDone();
             task.setDone(newState);
             notifyItemChanged(holder.getAdapterPosition());
-            if (listener != null) listener.onChecked(task.getId(), newState);
+            if (checkedListener != null) checkedListener.onChecked(task.getId(), newState);
         });
 
-        // --- En-tête de date : masqué dans cette vue ---
+        // --- Appui long = BottomSheet modifier/supprimer ---
+        holder.itemView.setOnLongClickListener(v -> {
+            showOptionsBottomSheet(v, task);
+            return true;
+        });
+
+        // --- En-tête de date masqué ---
         holder.layoutDateHeader.setVisibility(View.GONE);
+    }
+
+    private void showOptionsBottomSheet(View anchor, Task task) {
+        BottomSheetDialog sheet = new BottomSheetDialog(anchor.getContext(),
+                com.google.android.material.R.style.Theme_Design_BottomSheetDialog);
+
+        View sheetView = LayoutInflater.from(anchor.getContext())
+                .inflate(R.layout.bottom_sheet_task_options, null);
+        sheet.setContentView(sheetView);
+
+        if (sheet.getWindow() != null) {
+            sheet.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        TextView tvTitle = sheetView.findViewById(R.id.tvBottomSheetTaskTitle);
+        if (tvTitle != null) tvTitle.setText(task.getTitle());
+
+        LinearLayout btnEdit = sheetView.findViewById(R.id.btnBottomSheetEdit);
+        if (btnEdit != null) {
+            btnEdit.setOnClickListener(v -> {
+                sheet.dismiss();
+                if (editListener != null) editListener.onEdit(task);
+            });
+        }
+
+        LinearLayout btnDelete = sheetView.findViewById(R.id.btnBottomSheetDelete);
+        if (btnDelete != null) {
+            btnDelete.setOnClickListener(v -> {
+                sheet.dismiss();
+                if (deleteListener != null) deleteListener.onDelete(task.getId());
+            });
+        }
+
+        sheet.show();
     }
 
     @Override
@@ -112,6 +184,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         TextView tvTaskTitle;
         TextView tvTaskSubtitle;
         ImageView ivChronoBadge;
+        MaterialCardView cardTask;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -120,6 +193,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             tvTaskTitle      = itemView.findViewById(R.id.tvTaskTitle);
             tvTaskSubtitle   = itemView.findViewById(R.id.tvTaskSubtitle);
             ivChronoBadge    = itemView.findViewById(R.id.ivChronoBadge);
+            cardTask         = itemView.findViewById(R.id.cardTask);
         }
     }
 }
