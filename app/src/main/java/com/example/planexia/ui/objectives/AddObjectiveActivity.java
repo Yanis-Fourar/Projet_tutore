@@ -25,7 +25,7 @@ public class AddObjectiveActivity extends AppCompatActivity {
 
     private String selectedDueDate = "";
     private boolean isEditMode = false;
-    private int editPosition = -1;
+    private long editObjectiveId = -1; // ID en DB, pas la position dans la liste
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,6 @@ public class AddObjectiveActivity extends AppCompatActivity {
         btnPickDate     = findViewById(R.id.btnPickDate);
         btnSave         = findViewById(R.id.btnSaveObjective);
 
-        // ← AJOUT : bouton retour
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         btnPickDate.setOnClickListener(v -> openDatePicker());
@@ -71,7 +70,8 @@ public class AddObjectiveActivity extends AppCompatActivity {
         isEditMode = intent.getBooleanExtra("edit_mode", false);
         if (!isEditMode) return;
 
-        editPosition = intent.getIntExtra("edit_position", -1);
+        // Récupère l'ID en DB (pas la position)
+        editObjectiveId = intent.getLongExtra("edit_objective_id", -1);
         String title   = intent.getStringExtra(ObjectivesActivity.KEY_TITLE);
         String dueDate = intent.getStringExtra(ObjectivesActivity.KEY_DUE_DATE);
 
@@ -123,8 +123,9 @@ public class AddObjectiveActivity extends AppCompatActivity {
         result.putExtra(ObjectivesActivity.KEY_TITLE, title);
         result.putExtra(ObjectivesActivity.KEY_DUE_DATE, selectedDueDate);
         result.putExtra("edit_mode", isEditMode);
-        result.putExtra("edit_position", editPosition);
+        result.putExtra("edit_objective_id", editObjectiveId); // ID en DB
         setResult(RESULT_OK, result);
         finish();
     }
 }
+

@@ -226,6 +226,29 @@ public class PlanexiaRepository {
         );
     }
 
+    public int updateTask(long taskId, String title, String dueDate, String resourceText) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(PlanexiaDatabaseHelper.C_TITLE, title);
+        values.put(PlanexiaDatabaseHelper.C_DUE_DATE, dueDate);
+        values.put(PlanexiaDatabaseHelper.C_RESOURCE_TEXT, resourceText);
+        return db.update(
+                PlanexiaDatabaseHelper.T_TASKS,
+                values,
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(taskId)}
+        );
+    }
+
+    public int deleteTask(long taskId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        return db.delete(
+                PlanexiaDatabaseHelper.T_TASKS,
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(taskId)}
+        );
+    }
+
     public List<Task> getTasksByObjective(long objectiveId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(

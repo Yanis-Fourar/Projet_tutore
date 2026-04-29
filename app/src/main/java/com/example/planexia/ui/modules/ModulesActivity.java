@@ -77,7 +77,7 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
 
         repository = new PlanexiaRepository(this);
         SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", 1); // 1 = temporaire jusqu'au login
+        userId = prefs.getLong("user_id", 1);
 
         rvModules      = findViewById(R.id.rvModules);
         btnAddModule   = findViewById(R.id.btnAddModule);
@@ -91,6 +91,11 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
         reloadModules();
 
         btnAddModule.setOnClickListener(v -> {
+            // Vérification de la limite avant d'ouvrir le formulaire
+            if (moduleList.size() >= FREE_MODULE_LIMIT) {
+                Toast.makeText(this, "Limite de 3 matières atteinte. Passez Premium !", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent intent = new Intent(ModulesActivity.this, AddModuleActivity.class);
             addOrEditModuleLauncher.launch(intent);
         });
