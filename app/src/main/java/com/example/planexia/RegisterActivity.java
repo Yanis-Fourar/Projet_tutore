@@ -138,6 +138,9 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void goToDashboard() {
+        // Planifier les notifications à la création du compte
+        com.example.planexia.notifications.NotificationHelper.scheduleTaskReminderDaily(this);
+        com.example.planexia.notifications.NotificationHelper.scheduleDeadlineAlertDaily(this);
         Intent intent = new Intent(this, PlanningActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

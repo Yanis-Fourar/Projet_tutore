@@ -105,6 +105,18 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToDashboard() {
+        // Annuler les anciennes alarmes avant de replanifier
+        com.example.planexia.notifications.NotificationHelper.cancelAlarm(this, com.example.planexia.notifications.NotificationHelper.ALARM_TASK_REMINDER);
+        com.example.planexia.notifications.NotificationHelper.cancelAlarm(this, com.example.planexia.notifications.NotificationHelper.ALARM_DEADLINE_DAILY);
+        com.example.planexia.notifications.NotificationHelper.cancelAlarm(this, com.example.planexia.notifications.NotificationHelper.ALARM_PROGRESS_WEEKLY);
+        com.example.planexia.notifications.NotificationHelper.scheduleTaskReminderDaily(this);
+        com.example.planexia.notifications.NotificationHelper.scheduleDeadlineAlertDaily(this);
+        // Planifier la progression hebdomadaire si activée par l'utilisateur
+        android.content.SharedPreferences notifPrefs = getSharedPreferences(
+                com.example.planexia.notifications.NotificationsActivity.PREFS_NOTIF, MODE_PRIVATE);
+        if (notifPrefs.getBoolean(com.example.planexia.notifications.NotificationsActivity.KEY_PROGRESS_UPDATES, false)) {
+            com.example.planexia.notifications.NotificationHelper.scheduleWeeklyProgress(this);
+        }
         Intent intent = new Intent(this, PlanningActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

@@ -42,16 +42,22 @@ public class TaskReminderReceiver extends BroadcastReceiver {
                     NotificationHelper.sendTaskReminderNotification(context,
                             task != null ? task : "Tu as des tâches à compléter !");
                 }
+                // Replanifier pour le lendemain (setExactAndAllowWhileIdle ne se répète pas)
+                NotificationHelper.scheduleTaskReminderDaily(context);
                 break;
             case TYPE_DEADLINE_ALERT:
                 if (prefs.getBoolean(NotificationsActivity.KEY_DEADLINE_ALERTS, true)) {
                     NotificationHelper.sendDeadlineAlertNotification(context, countTasksDueToday(context));
                 }
+                // Replanifier pour le lendemain
+                NotificationHelper.scheduleDeadlineAlertDaily(context);
                 break;
             case TYPE_PROGRESS_UPDATE:
                 if (prefs.getBoolean(NotificationsActivity.KEY_PROGRESS_UPDATES, false)) {
                     NotificationHelper.sendProgressUpdateNotification(context, getGlobalProgress(context));
                 }
+                // Replanifier pour la semaine prochaine
+                NotificationHelper.scheduleWeeklyProgress(context);
                 break;
         }
     }

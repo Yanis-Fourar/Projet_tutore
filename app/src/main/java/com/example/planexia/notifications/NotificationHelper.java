@@ -88,7 +88,13 @@ public class NotificationHelper {
         intent.putExtra(TaskReminderReceiver.EXTRA_TYPE, type);
         PendingIntent pi = PendingIntent.getBroadcast(context, alarmId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        if (am != null) am.setRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
+        if (am == null) return;
+        // setExactAndAllowWhileIdle car setRepeating est inexact sur Android 6+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        } else {
+            am.setRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
+        }
     }
 
     public static void cancelAlarm(Context context, int alarmId) {

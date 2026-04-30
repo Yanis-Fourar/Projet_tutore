@@ -166,13 +166,14 @@
                                 android:textColor="#1A1A1A"
                                 android:textSize="14sp"
                                 android:textStyle="bold"/>
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="30 min avant la deadline"
+                                android:layout_marginTop="2dp"
+                                android:text="2J avant la deadline"
                                 android:textColor="#AAAAAA"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp"/>
+                                android:textSize="12sp" />
                         </LinearLayout>
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/switchTaskReminders"
@@ -215,7 +216,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Pour les échéances proches"
+                                android:text="Pour les échéances d'aujourd'hui"
                                 android:textColor="#AAAAAA"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp"/>
@@ -261,7 +262,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Résumé hebdomadaire"
+                                android:text="Résumé hebdomadaire de la semaine"
                                 android:textColor="#AAAAAA"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp"/>
