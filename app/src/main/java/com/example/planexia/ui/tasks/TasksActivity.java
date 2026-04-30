@@ -57,15 +57,15 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
-        SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", -1);
+
+        userId = new com.example.planexia.data.SessionManager(this).getUserId();
 
         repository = new PlanexiaRepository(this);
 
         recyclerView = findViewById(R.id.recyclerViewTasks);
         tvTodo       = findViewById(R.id.tvTodoCount);
         tvDone       = findViewById(R.id.tvDoneCount);
-        tvSubtitle   = findViewById(R.id.tvSubtitle);
+
 
         CardView btnAdd = findViewById(R.id.btnAddTask);
         if (btnAdd != null) btnAdd.setOnClickListener(v -> showAddTaskDialog());
@@ -73,16 +73,32 @@ public class TasksActivity extends AppCompatActivity {
         allTasks       = new ArrayList<>();
         displayedTasks = new ArrayList<>();
 
-        adapter = new TaskAdapter(displayedTasks, (taskId, isDone) -> {
-            repository.setTaskDone(taskId, isDone);
-            for (Task t : allTasks) {
-                if (t.getId() == taskId) { t.setDone(isDone); break; }
-            }
-            applyFilter(currentFilter);
-            updateCounts();
-        });
+        adapter = new TaskAdapter(displayedTasks,
+                (taskId, isDone) -> {
+                    repository.setTaskDone(taskId, isDone);
+                    for (Task t : allTasks) {
+                        if (t.getId() == taskId) { t.setDone(isDone); break; }
+                    }
+                    applyFilter(currentFilter);
+                    updateCounts();
+                },
+                task -> showEditTaskDialog(task),
+                taskId -> {
+                    new androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("Supprimer la tâche")
+                            .setMessage("Es-tu sûr de vouloir supprimer cette tâche ?")
+                            .setPositiveButton("Supprimer", (d, w) -> {
+                                repository.deleteTask(taskId);
+                                loadTasks();
+                                Toast.makeText(this, "Tâche supprimée", Toast.LENGTH_SHORT).show();
+                            })
+                            .setNegativeButton("Annuler", null)
+                            .show();
+                }
+        );
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(adapter);
 
         Button btnFilterAll  = findViewById(R.id.btnFilterAll);
@@ -170,13 +186,16 @@ public class TasksActivity extends AppCompatActivity {
         btnNext.setOnClickListener(v -> {
             Objective selected = objectives.get(spinner.getSelectedItemPosition());
             dialog.dismiss();
-            showStep3TaskDialog(selected.getId());
+            showStep3TaskDialog(selected);
         });
 
         dialog.show();
     }
 
-    private void showStep3TaskDialog(long objectiveId) {
+    private void showStep3TaskDialog(Objective objective) {
+        long objectiveId = objective.getId();
+        String objectiveDueDate = objective.getDueDate(); // format "yyyy-MM-dd"
+
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_add_task);
@@ -195,20 +214,60 @@ public class TasksActivity extends AppCompatActivity {
         Button btnCancel     = dialog.findViewById(R.id.btnDialogCancel);
         Button btnAdd        = dialog.findViewById(R.id.btnDialogAdd);
 
-        final String[] selectedDate = {null};
+        // Pré-remplir avec la date limite de l'objectif
+        final String[] selectedDate = {objectiveDueDate};
+        if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
+            try {
+                String[] parts = objectiveDueDate.split("-");
+                int y = Integer.parseInt(parts[0]);
+                int m = Integer.parseInt(parts[1]) - 1; // mois 0-based
+                int d = Integer.parseInt(parts[2]);
+                String[] moisNoms = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
+                        "juil.", "août", "sep.", "oct.", "nov.", "déc."};
+                tvDateValue.setText(d + " " + moisNoms[m] + " " + y);
+                tvDateValue.setTextColor(Color.parseColor("#1F1F1F"));
+                btnDate.setBackgroundResource(R.drawable.bg_edit_text);
+            } catch (Exception ignored) {}
+        }
+
+        // Calculer maxDate à partir de la dueDate de l'objectif
+        long maxDateMillis = Long.MAX_VALUE;
+        if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
+            try {
+                String[] parts = objectiveDueDate.split("-");
+                Calendar calMax = Calendar.getInstance();
+                calMax.set(Integer.parseInt(parts[0]),
+                        Integer.parseInt(parts[1]) - 1,
+                        Integer.parseInt(parts[2]), 23, 59, 59);
+                maxDateMillis = calMax.getTimeInMillis();
+            } catch (Exception ignored) {}
+        }
+        final long finalMaxDateMillis = maxDateMillis;
 
         btnDate.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
-            new DatePickerDialog(this, (view, y, m, d) -> {
+            // Initialiser le picker sur la date pré-sélectionnée si elle existe
+            if (selectedDate[0] != null && !selectedDate[0].isEmpty()) {
+                try {
+                    String[] parts = selectedDate[0].split("-");
+                    cal.set(Integer.parseInt(parts[0]),
+                            Integer.parseInt(parts[1]) - 1,
+                            Integer.parseInt(parts[2]));
+                } catch (Exception ignored) {}
+            }
+            DatePickerDialog picker = new DatePickerDialog(this, (view, y, m, d) -> {
                 selectedDate[0] = String.format("%04d-%02d-%02d", y, m + 1, d);
-                String[] mois = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
+                String[] moisNoms = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
                         "juil.", "août", "sep.", "oct.", "nov.", "déc."};
-                tvDateValue.setText(d + " " + mois[m] + " " + y);
+                tvDateValue.setText(d + " " + moisNoms[m] + " " + y);
                 tvDateValue.setTextColor(Color.parseColor("#1F1F1F"));
                 btnDate.setBackgroundResource(R.drawable.bg_edit_text);
-            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
-            {{getDatePicker().setMinDate(System.currentTimeMillis() - 1000);}}
-                    .show();
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            picker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            if (finalMaxDateMillis != Long.MAX_VALUE) {
+                picker.getDatePicker().setMaxDate(finalMaxDateMillis);
+            }
+            picker.show();
         });
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
@@ -217,7 +276,7 @@ public class TasksActivity extends AppCompatActivity {
             String resource = etResource.getText().toString().trim();
             boolean error   = false;
 
-            if (TextUtils.isEmpty(title)) { etTitle.setError("Le titre est obligatoire"); error = true; }
+            if (android.text.TextUtils.isEmpty(title)) { etTitle.setError("Le titre est obligatoire"); error = true; }
             if (selectedDate[0] == null) {
                 btnDate.setBackgroundResource(R.drawable.circle_outline_red);
                 tvDateValue.setHint("⚠ Veuillez choisir une date");
@@ -226,13 +285,120 @@ public class TasksActivity extends AppCompatActivity {
             if (error) return;
 
             long newId = repository.addTask(objectiveId, title, selectedDate[0],
-                    TextUtils.isEmpty(resource) ? null : resource);
+                    android.text.TextUtils.isEmpty(resource) ? null : resource);
             if (newId != -1) {
                 dialog.dismiss();
                 Toast.makeText(this, "Tâche ajoutée ✓", Toast.LENGTH_SHORT).show();
                 loadTasks();
             } else {
                 Toast.makeText(this, "Erreur lors de l'ajout", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void showEditTaskDialog(Task task) {
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_add_task);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(
+                    (int) (getResources().getDisplayMetrics().widthPixels * 0.92f),
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
+
+        EditText etTitle     = dialog.findViewById(R.id.etTaskTitle);
+        EditText etResource  = dialog.findViewById(R.id.etTaskResource);
+        LinearLayout btnDate = dialog.findViewById(R.id.btnPickDate);
+        TextView tvDateValue = dialog.findViewById(R.id.tvDateValue);
+        Button btnCancel     = dialog.findViewById(R.id.btnDialogCancel);
+        Button btnAdd        = dialog.findViewById(R.id.btnDialogAdd);
+
+        btnAdd.setText("Modifier");
+        etTitle.setText(task.getTitle());
+        if (!android.text.TextUtils.isEmpty(task.getResourceText())) {
+            etResource.setText(task.getResourceText());
+        }
+
+        final String[] selectedDate = {task.getDueDate()};
+        if (!android.text.TextUtils.isEmpty(task.getDueDate())) {
+            try {
+                String[] parts = task.getDueDate().split("-");
+                int y = Integer.parseInt(parts[0]);
+                int m = Integer.parseInt(parts[1]) - 1;
+                int d = Integer.parseInt(parts[2]);
+                String[] moisNoms = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
+                        "juil.", "août", "sep.", "oct.", "nov.", "déc."};
+                tvDateValue.setText(d + " " + moisNoms[m] + " " + y);
+                tvDateValue.setTextColor(Color.parseColor("#1F1F1F"));
+                btnDate.setBackgroundResource(R.drawable.bg_edit_text);
+            } catch (Exception ignored) {}
+        }
+
+        // Récupérer la date limite de l'objectif parent pour bloquer le DatePicker
+        long maxDateMillis = Long.MAX_VALUE;
+        String objectiveDueDate = repository.getObjectiveDueDateForTask(task.getId());
+        if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
+            try {
+                String[] parts = objectiveDueDate.split("-");
+                Calendar calMax = Calendar.getInstance();
+                calMax.set(Integer.parseInt(parts[0]),
+                        Integer.parseInt(parts[1]) - 1,
+                        Integer.parseInt(parts[2]), 23, 59, 59);
+                maxDateMillis = calMax.getTimeInMillis();
+            } catch (Exception ignored) {}
+        }
+        final long finalMaxDateMillis = maxDateMillis;
+
+        btnDate.setOnClickListener(v -> {
+            Calendar cal = Calendar.getInstance();
+            if (selectedDate[0] != null && !selectedDate[0].isEmpty()) {
+                try {
+                    String[] parts = selectedDate[0].split("-");
+                    cal.set(Integer.parseInt(parts[0]),
+                            Integer.parseInt(parts[1]) - 1,
+                            Integer.parseInt(parts[2]));
+                } catch (Exception ignored) {}
+            }
+            DatePickerDialog picker = new DatePickerDialog(this, (view, y, m, d) -> {
+                selectedDate[0] = String.format("%04d-%02d-%02d", y, m + 1, d);
+                String[] moisNoms = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
+                        "juil.", "août", "sep.", "oct.", "nov.", "déc."};
+                tvDateValue.setText(d + " " + moisNoms[m] + " " + y);
+                tvDateValue.setTextColor(Color.parseColor("#1F1F1F"));
+                btnDate.setBackgroundResource(R.drawable.bg_edit_text);
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            picker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            if (finalMaxDateMillis != Long.MAX_VALUE) {
+                picker.getDatePicker().setMaxDate(finalMaxDateMillis);
+            }
+            picker.show();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnAdd.setOnClickListener(v -> {
+            String title    = etTitle.getText().toString().trim();
+            String resource = etResource.getText().toString().trim();
+            boolean error   = false;
+
+            if (android.text.TextUtils.isEmpty(title)) { etTitle.setError("Le titre est obligatoire"); error = true; }
+            if (selectedDate[0] == null) {
+                btnDate.setBackgroundResource(R.drawable.circle_outline_red);
+                error = true;
+            }
+            if (error) return;
+
+            int updated = repository.updateTask(task.getId(), title, selectedDate[0],
+                    android.text.TextUtils.isEmpty(resource) ? null : resource);
+            if (updated > 0) {
+                dialog.dismiss();
+                Toast.makeText(this, "Tâche modifiée ✓", Toast.LENGTH_SHORT).show();
+                loadTasks();
+            } else {
+                Toast.makeText(this, "Erreur lors de la modification", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -325,7 +491,12 @@ public class TasksActivity extends AppCompatActivity {
                 startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
                 finish();
                 return true;
+            } else if (id == R.id.nav_profil) {
+                startActivity(new android.content.Intent(this, com.example.planexia.ProfileActivity.class));
+                finish();
+                return true;
             }
+
             return false;
         });
     }

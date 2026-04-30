@@ -7,22 +7,28 @@
     android:orientation="vertical"
     android:background="#F4F1F8">
 
-    <!-- HEADER VIOLET -->
+    <!-- ✅ CORRECTION 1 : Status bar violette fine -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#6C3FC5"/>
+
+    <!-- ✅ CORRECTION 1 : Titre sur fond blanc -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#6C3FC5"
+        android:background="#FFFFFF"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:paddingTop="48dp"
-        android:paddingBottom="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Progression"
-            android:textColor="#FFFFFF"
+            android:textColor="#1A1A1A"
             android:textSize="24sp"
             android:textStyle="bold"/>
 
@@ -40,7 +46,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 3 CARTES STATS -->
+            <!-- 3 CARTES STATS (inchangées) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -88,6 +94,7 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
+                <!-- ✅ CORRECTION : "Total" → "Étudiées" -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="100dp"
@@ -104,45 +111,13 @@
                         android:gravity="center_horizontal">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⏱" android:textSize="16sp"/>
                         <TextView android:id="@+id/tvTotalTasksCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total" android:textColor="#CCE4FF" android:textSize="11sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Étudiées" android:textColor="#CCE4FF" android:textSize="11sp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
-            <!-- BARRE GLOBALE -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Progression globale" android:textStyle="bold" android:textColor="#1F1F1F" android:textSize="14sp"/>
-                        <TextView android:id="@+id/tvGlobalPercentBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0%" android:textColor="#6C3FC5" android:textStyle="bold" android:textSize="14sp"/>
-                    </LinearLayout>
-                    <ProgressBar
-                        android:id="@+id/pbGlobal"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="10dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressTint="#6C3FC5"
-                        android:progressBackgroundTint="#E8E0F5"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            <!-- ✅ CORRECTION 2 : Carte "Progression globale" SUPPRIMÉE -->
 
             <!-- PAR MATIÈRE titre -->
             <TextView
@@ -162,7 +137,7 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- BANNIÈRE PREMIUM -->
+            <!-- BANNIÈRE PREMIUM (inchangée) -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -175,14 +150,20 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="18dp">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📊" android:textSize="20sp" android:layout_marginEnd="10dp"/>
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Statistiques avancées" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold"/>
                     </LinearLayout>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Accède à des graphiques détaillés, courbes de progression, analyse de ton temps d'étude et bien plus" android:textColor="#D4C5F0" android:textSize="13sp" android:layout_marginBottom="10dp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Graphiques temps réel" android:textColor="#D4C5F0" android:textSize="12sp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Analyse hebdomadaire et mensuelle" android:textColor="#D4C5F0" android:textSize="12sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Répartition par matière" android:textColor="#D4C5F0" android:textSize="12sp" android:layout_marginBottom="14dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Répartition par matière" android:textColor="#D4C5F0" android:textSize="12sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Courbes de progression" android:textColor="#D4C5F0" android:textSize="12sp" android:layout_marginBottom="14dp"/>
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="48dp"

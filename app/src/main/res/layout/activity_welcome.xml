@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F7FB"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="48dp">
+
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_logo_square"
+            android:src="@drawable/ic_book"
+            android:padding="16dp"
+            android:layout_marginTop="120dp"
+            android:contentDescription="Logo Planexia" />
+
+        <!-- Titre -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bienvenue sur Planexia"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#1F1F1F"
+            android:layout_marginTop="32dp" />
+
+        <!-- Sous-titre -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Commence ton parcours d'apprentissage"
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:layout_marginTop="8dp" />
+
+        <!-- Bouton Créer un compte -->
+        <Button
+            android:id="@+id/btnGoRegister"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Créer un compte"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_save_button"
+            android:layout_marginTop="48dp" />
+
+        <!-- Bouton Se connecter -->
+        <Button
+            android:id="@+id/btnGoLogin"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Se connecter"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_button_outline"
+            android:layout_marginTop="12dp" />
+
+        <!-- Mention légale -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="En continuant, tu acceptes nos conditions d'utilisation et notre politique de confidentialité"
+            android:textSize="11sp"
+            android:textColor="#999999"
+            android:gravity="center"
+            android:layout_marginTop="24dp" />
+
+    </LinearLayout>
+</ScrollView>

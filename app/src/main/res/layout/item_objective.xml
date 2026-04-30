@@ -21,7 +21,7 @@
             android:id="@+id/viewColor"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:background="@drawable/bg_color_circle"
+            android:background="@drawable/circle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
