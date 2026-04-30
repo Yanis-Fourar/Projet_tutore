@@ -98,6 +98,7 @@ public class TasksActivity extends AppCompatActivity {
         );
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(adapter);
 
         Button btnFilterAll  = findViewById(R.id.btnFilterAll);
