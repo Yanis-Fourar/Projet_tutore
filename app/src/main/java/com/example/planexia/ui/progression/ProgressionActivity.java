@@ -17,6 +17,8 @@ import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.modules.ModulesActivity;
+import com.example.planexia.ui.premium.HelpSupportActivity;
+import com.example.planexia.ui.premium.PremiumStatsActivity;
 import com.example.planexia.ui.tasks.TasksActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -39,6 +41,12 @@ public class ProgressionActivity extends AppCompatActivity {
 
         loadData();
         setupBottomNav();
+
+        findViewById(R.id.btnPremiumStats).setOnClickListener(v ->
+                startActivity(new Intent(this, PremiumStatsActivity.class)));
+
+        findViewById(R.id.btnHelpSupport).setOnClickListener(v ->
+                startActivity(new Intent(this, HelpSupportActivity.class)));
     }
 
     @Override

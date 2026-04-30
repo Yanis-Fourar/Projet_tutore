@@ -28,6 +28,8 @@
         <activity android:name=".ui.tasks.TasksActivity" />
         <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
         <activity android:name=".ui.progression.ProgressionActivity" />
+        <activity android:name=".ui.premium.PremiumStatsActivity" />
+        <activity android:name=".ui.premium.HelpSupportActivity" />
 
     </application>
 

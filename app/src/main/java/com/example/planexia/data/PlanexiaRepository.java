@@ -342,6 +342,66 @@ public class PlanexiaRepository {
         return new int[]{total, done};
     }
 
+    public int getPendingTasksCount(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
+                " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
+                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
+                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ? AND t." + PlanexiaDatabaseHelper.C_IS_DONE + " = 0;";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
+    public int getTotalObjectivesCount(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o" +
+                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
+                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?;";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
+    public int getObjectivesCountForModule(long moduleId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_OBJECTIVES +
+                        " WHERE " + PlanexiaDatabaseHelper.C_MODULE_ID + " = ?;",
+                new String[]{String.valueOf(moduleId)}
+        );
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
+    /** Retourne int[7] : nb de tâches ayant une due_date par jour [Lun, Mar, Mer, Jeu, Ven, Sam, Dim] */
+    public int[] getTasksDueByDayOfWeek(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int[] counts = new int[7];
+        String sql = "SELECT strftime('%w', t." + PlanexiaDatabaseHelper.C_DUE_DATE + "), COUNT(*)" +
+                " FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
+                " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
+                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
+                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?" +
+                " AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " IS NOT NULL AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " != ''" +
+                " GROUP BY strftime('%w', t." + PlanexiaDatabaseHelper.C_DUE_DATE + ");";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
+        while (c.moveToNext()) {
+            int dow = c.getInt(0); // 0=Dim, 1=Lun, ..., 6=Sam
+            int count = c.getInt(1);
+            int idx = (dow == 0) ? 6 : dow - 1; // Lun=0, ..., Dim=6
+            counts[idx] = count;
+        }
+        c.close();
+        return counts;
+    }
+
     /**
      * Retourne pour chaque module : [total tasks, done tasks]
      * Utilisé par la page Progression pour afficher la barre par matière.
