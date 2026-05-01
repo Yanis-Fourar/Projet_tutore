@@ -7,13 +7,11 @@
     android:orientation="vertical"
     android:background="#EFEFEF">
 
-    <!-- ✅ CORRECTION 1 : Status bar violette fine (comme la maquette) -->
     <View
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#6C3FC5"/>
 
-    <!-- ✅ CORRECTION 1 : "Mes Tâches" + bouton + sur fond BLANC, pas violet -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +32,6 @@
             android:textSize="22sp"
             android:textStyle="bold"/>
 
-        <!-- Bouton + -->
         <androidx.cardview.widget.CardView
             android:id="@+id/btnAddTask"
             android:layout_width="44dp"
@@ -56,7 +53,6 @@
 
     </LinearLayout>
 
-    <!-- CONTENU SCROLLABLE -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -69,14 +65,12 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- ✅ CORRECTION 2 : Cartes À faire / Complétées avec plus de padding et grands chiffres -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="14dp">
 
-                <!-- Carte À faire -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -113,7 +107,6 @@
 
                         </LinearLayout>
 
-                        <!-- ✅ Chiffre grand comme la maquette -->
                         <TextView
                             android:id="@+id/tvTodoCount"
                             android:layout_width="wrap_content"
@@ -128,7 +121,6 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Carte Complétées -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -165,7 +157,6 @@
 
                         </LinearLayout>
 
-                        <!-- ✅ Chiffre grand comme la maquette -->
                         <TextView
                             android:id="@+id/tvDoneCount"
                             android:layout_width="wrap_content"
@@ -182,7 +173,7 @@
 
             </LinearLayout>
 
-            <!-- BANNIÈRE EXPORT PDF (inchangée) -->
+            <!-- BANNIÈRE EXPORT PDF -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -229,7 +220,9 @@
 
                     </LinearLayout>
 
+                    <!-- ← AJOUT ID -->
                     <Button
+                        android:id="@+id/btnDecouvrirExportPDF"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:text="Découvrir"
@@ -244,7 +237,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- FILTRES (inchangés) -->
+            <!-- FILTRES -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -288,7 +281,6 @@
 
             </LinearLayout>
 
-            <!-- LISTE DES TASKS -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewTasks"
                 android:layout_width="match_parent"
@@ -304,7 +296,6 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- BOTTOM NAVIGATION -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"

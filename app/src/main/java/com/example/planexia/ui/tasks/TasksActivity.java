@@ -3,7 +3,6 @@ package com.example.planexia.ui.tasks;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -27,6 +26,7 @@ import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Module;
 import com.example.planexia.model.Objective;
 import com.example.planexia.model.Task;
+import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.ui.modules.ModulesActivity;
 import com.example.planexia.ui.progression.ProgressionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -57,18 +57,25 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
-
         userId = new com.example.planexia.data.SessionManager(this).getUserId();
-
         repository = new PlanexiaRepository(this);
 
         recyclerView = findViewById(R.id.recyclerViewTasks);
         tvTodo       = findViewById(R.id.tvTodoCount);
         tvDone       = findViewById(R.id.tvDoneCount);
 
-
         CardView btnAdd = findViewById(R.id.btnAddTask);
         if (btnAdd != null) btnAdd.setOnClickListener(v -> showAddTaskDialog());
+
+        // ← AJOUT : bouton Découvrir Export PDF
+        Button btnExportPDF = findViewById(R.id.btnDecouvrirExportPDF);
+        if (btnExportPDF != null) {
+            btnExportPDF.setOnClickListener(v ->
+                    PremiumDialog.show(this, () -> {
+                        // callback : rien de spécial pour l'export PDF
+                    })
+            );
+        }
 
         allTasks       = new ArrayList<>();
         displayedTasks = new ArrayList<>();
@@ -125,8 +132,6 @@ public class TasksActivity extends AppCompatActivity {
         applyFilter(currentFilter);
         updateCounts();
     }
-
-    // ── DIALOG 3 ÉTAPES ──────────────────────────────────────
 
     private void showAddTaskDialog() {
         List<Module> modules = repository.getModulesByUser(userId);
@@ -194,7 +199,7 @@ public class TasksActivity extends AppCompatActivity {
 
     private void showStep3TaskDialog(Objective objective) {
         long objectiveId = objective.getId();
-        String objectiveDueDate = objective.getDueDate(); // format "yyyy-MM-dd"
+        String objectiveDueDate = objective.getDueDate();
 
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -214,13 +219,12 @@ public class TasksActivity extends AppCompatActivity {
         Button btnCancel     = dialog.findViewById(R.id.btnDialogCancel);
         Button btnAdd        = dialog.findViewById(R.id.btnDialogAdd);
 
-        // Pré-remplir avec la date limite de l'objectif
         final String[] selectedDate = {objectiveDueDate};
         if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
             try {
                 String[] parts = objectiveDueDate.split("-");
                 int y = Integer.parseInt(parts[0]);
-                int m = Integer.parseInt(parts[1]) - 1; // mois 0-based
+                int m = Integer.parseInt(parts[1]) - 1;
                 int d = Integer.parseInt(parts[2]);
                 String[] moisNoms = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
                         "juil.", "août", "sep.", "oct.", "nov.", "déc."};
@@ -230,7 +234,6 @@ public class TasksActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         }
 
-        // Calculer maxDate à partir de la dueDate de l'objectif
         long maxDateMillis = Long.MAX_VALUE;
         if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
             try {
@@ -246,7 +249,6 @@ public class TasksActivity extends AppCompatActivity {
 
         btnDate.setOnClickListener(v -> {
             Calendar cal = Calendar.getInstance();
-            // Initialiser le picker sur la date pré-sélectionnée si elle existe
             if (selectedDate[0] != null && !selectedDate[0].isEmpty()) {
                 try {
                     String[] parts = selectedDate[0].split("-");
@@ -276,7 +278,7 @@ public class TasksActivity extends AppCompatActivity {
             String resource = etResource.getText().toString().trim();
             boolean error   = false;
 
-            if (android.text.TextUtils.isEmpty(title)) { etTitle.setError("Le titre est obligatoire"); error = true; }
+            if (TextUtils.isEmpty(title)) { etTitle.setError("Le titre est obligatoire"); error = true; }
             if (selectedDate[0] == null) {
                 btnDate.setBackgroundResource(R.drawable.circle_outline_red);
                 tvDateValue.setHint("⚠ Veuillez choisir une date");
@@ -285,7 +287,7 @@ public class TasksActivity extends AppCompatActivity {
             if (error) return;
 
             long newId = repository.addTask(objectiveId, title, selectedDate[0],
-                    android.text.TextUtils.isEmpty(resource) ? null : resource);
+                    TextUtils.isEmpty(resource) ? null : resource);
             if (newId != -1) {
                 dialog.dismiss();
                 Toast.makeText(this, "Tâche ajoutée ✓", Toast.LENGTH_SHORT).show();
@@ -319,12 +321,12 @@ public class TasksActivity extends AppCompatActivity {
 
         btnAdd.setText("Modifier");
         etTitle.setText(task.getTitle());
-        if (!android.text.TextUtils.isEmpty(task.getResourceText())) {
+        if (!TextUtils.isEmpty(task.getResourceText())) {
             etResource.setText(task.getResourceText());
         }
 
         final String[] selectedDate = {task.getDueDate()};
-        if (!android.text.TextUtils.isEmpty(task.getDueDate())) {
+        if (!TextUtils.isEmpty(task.getDueDate())) {
             try {
                 String[] parts = task.getDueDate().split("-");
                 int y = Integer.parseInt(parts[0]);
@@ -338,7 +340,6 @@ public class TasksActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         }
 
-        // Récupérer la date limite de l'objectif parent pour bloquer le DatePicker
         long maxDateMillis = Long.MAX_VALUE;
         String objectiveDueDate = repository.getObjectiveDueDateForTask(task.getId());
         if (objectiveDueDate != null && !objectiveDueDate.isEmpty()) {
@@ -384,7 +385,7 @@ public class TasksActivity extends AppCompatActivity {
             String resource = etResource.getText().toString().trim();
             boolean error   = false;
 
-            if (android.text.TextUtils.isEmpty(title)) { etTitle.setError("Le titre est obligatoire"); error = true; }
+            if (TextUtils.isEmpty(title)) { etTitle.setError("Le titre est obligatoire"); error = true; }
             if (selectedDate[0] == null) {
                 btnDate.setBackgroundResource(R.drawable.circle_outline_red);
                 error = true;
@@ -392,7 +393,7 @@ public class TasksActivity extends AppCompatActivity {
             if (error) return;
 
             int updated = repository.updateTask(task.getId(), title, selectedDate[0],
-                    android.text.TextUtils.isEmpty(resource) ? null : resource);
+                    TextUtils.isEmpty(resource) ? null : resource);
             if (updated > 0) {
                 dialog.dismiss();
                 Toast.makeText(this, "Tâche modifiée ✓", Toast.LENGTH_SHORT).show();
@@ -418,8 +419,6 @@ public class TasksActivity extends AppCompatActivity {
         }
         return dialog;
     }
-
-    // ── FILTRES ───────────────────────────────────────────────
 
     private void setFilter(String filter, Button btnAll, Button btnLate, Button btnDone) {
         currentFilter = filter;
@@ -470,8 +469,6 @@ public class TasksActivity extends AppCompatActivity {
             tvSubtitle.setText(todo + " tâche" + (todo > 1 ? "s" : "") + " active" + (todo > 1 ? "s" : ""));
     }
 
-    // ── BOTTOM NAV ────────────────────────────────────────────
-
     private void setupBottomNav() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         if (bottomNav == null) return;
@@ -492,11 +489,10 @@ public class TasksActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (id == R.id.nav_profil) {
-                startActivity(new android.content.Intent(this, com.example.planexia.ProfileActivity.class));
+                startActivity(new Intent(this, com.example.planexia.ProfileActivity.class));
                 finish();
                 return true;
             }
-
             return false;
         });
     }

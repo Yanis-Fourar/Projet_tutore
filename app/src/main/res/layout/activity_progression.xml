@@ -7,13 +7,11 @@
     android:orientation="vertical"
     android:background="#F4F1F8">
 
-    <!-- ✅ CORRECTION 1 : Status bar violette fine -->
     <View
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#6C3FC5"/>
 
-    <!-- ✅ CORRECTION 1 : Titre sur fond blanc -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,7 +44,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 3 CARTES STATS (inchangées) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,7 +91,6 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- ✅ CORRECTION : "Total" → "Étudiées" -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="100dp"
@@ -117,9 +113,6 @@
 
             </LinearLayout>
 
-            <!-- ✅ CORRECTION 2 : Carte "Progression globale" SUPPRIMÉE -->
-
-            <!-- PAR MATIÈRE titre -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -129,7 +122,6 @@
                 android:textColor="#1F1F1F"
                 android:layout_marginBottom="10dp"/>
 
-            <!-- Container dynamique modules -->
             <LinearLayout
                 android:id="@+id/containerModules"
                 android:layout_width="match_parent"
@@ -137,7 +129,7 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- BANNIÈRE PREMIUM (inchangée) -->
+            <!-- BANNIÈRE PREMIUM -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -164,7 +156,10 @@
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Analyse hebdomadaire et mensuelle" android:textColor="#D4C5F0" android:textSize="12sp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Répartition par matière" android:textColor="#D4C5F0" android:textSize="12sp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Courbes de progression" android:textColor="#D4C5F0" android:textSize="12sp" android:layout_marginBottom="14dp"/>
+
+                    <!-- ← AJOUT ID -->
                     <Button
+                        android:id="@+id/btnDebloquerStatsPremium"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="Débloquer les statistiques Premium"
