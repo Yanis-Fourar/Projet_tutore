@@ -49,6 +49,7 @@ public class TasksActivity extends AppCompatActivity {
     private TextView tvTodo;
     private TextView tvDone;
     private TextView tvSubtitle;
+    private androidx.cardview.widget.CardView bannerExportPdf;
 
     private List<Task> allTasks;
     private List<Task> displayedTasks;
@@ -67,18 +68,23 @@ public class TasksActivity extends AppCompatActivity {
         userId = new com.example.planexia.data.SessionManager(this).getUserId();
         repository = new PlanexiaRepository(this);
 
-        recyclerView = findViewById(R.id.recyclerViewTasks);
-        tvTodo       = findViewById(R.id.tvTodoCount);
-        tvDone       = findViewById(R.id.tvDoneCount);
+        recyclerView    = findViewById(R.id.recyclerViewTasks);
+        tvTodo          = findViewById(R.id.tvTodoCount);
+        tvDone          = findViewById(R.id.tvDoneCount);
+        bannerExportPdf = findViewById(R.id.bannerExportPdf);
 
         CardView btnAdd = findViewById(R.id.btnAddTask);
         if (btnAdd != null) btnAdd.setOnClickListener(v -> showAddTaskDialog());
 
         Button btnExportPDF = findViewById(R.id.btnDecouvrirExportPDF);
         if (btnExportPDF != null) {
-            btnExportPDF.setOnClickListener(v ->
-                    PremiumDialog.show(this, () -> exportPdf())
-            );
+            btnExportPDF.setOnClickListener(v -> {
+                if (repository.isPremium(userId)) {
+                    exportPdf();
+                } else {
+                    PremiumDialog.show(this, () -> exportPdf());
+                }
+            });
         }
 
         allTasks       = new ArrayList<>();
@@ -128,6 +134,15 @@ public class TasksActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadTasks();
+        updateExportBanner();
+    }
+
+    private void updateExportBanner() {
+        if (bannerExportPdf != null) {
+            bannerExportPdf.setVisibility(
+                    repository.isPremium(userId) ? android.view.View.GONE : android.view.View.VISIBLE
+            );
+        }
     }
 
     private void loadTasks() {
