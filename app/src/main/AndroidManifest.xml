@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
         tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:allowBackup="true"
@@ -27,12 +29,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".WelcomeActivity" android:exported="false" />
-        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".WelcomeActivity"  android:exported="false" />
+        <activity android:name=".LoginActivity"    android:exported="false" />
         <activity android:name=".RegisterActivity" android:exported="false" />
 
         <!-- ===== APP PRINCIPALE ===== -->
-        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".MainActivity"    android:exported="false" />
         <activity android:name=".PlanningActivity" android:exported="false" />
 
         <activity android:name=".ui.modules.ModulesActivity" />
@@ -43,6 +45,16 @@
         <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
         <activity android:name=".ui.progression.ProgressionActivity" />
         <activity android:name=".ProfileActivity" android:exported="false" />
+
+        <!-- ===== CHRONO ===== -->
+        <activity
+            android:name=".ChronoActivity"
+            android:exported="false"
+            android:launchMode="singleTop"/>
+
+        <service
+            android:name=".ChronoService"
+            android:exported="false"/>
 
         <!-- Notifications -->
         <activity android:name=".notifications.NotificationsActivity" android:exported="false"/>

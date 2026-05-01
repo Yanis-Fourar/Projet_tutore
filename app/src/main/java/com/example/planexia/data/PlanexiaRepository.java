@@ -505,4 +505,68 @@ public class PlanexiaRepository {
 
         return new int[]{total, done};
     }
+
+    // ══════════════════════════════════════════════════════════════
+    //  CHRONO SESSIONS
+    // ══════════════════════════════════════════════════════════════
+
+    /** Sauvegarder une session chrono */
+    public long addChronoSession(long userId, String taskLabel, long durationMs, int goalMin) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put(PlanexiaDatabaseHelper.C_USER_ID,    userId);
+        v.put(PlanexiaDatabaseHelper.C_TASK_LABEL, taskLabel);
+        v.put(PlanexiaDatabaseHelper.C_DURATION_MS, durationMs);
+        v.put(PlanexiaDatabaseHelper.C_GOAL_MIN,   goalMin);
+        v.put(PlanexiaDatabaseHelper.C_CREATED_AT, System.currentTimeMillis());
+        return db.insert(PlanexiaDatabaseHelper.T_CHRONO_SESSIONS, null, v);
+    }
+
+    /**
+     * Récupérer les sessions des dernières 24h pour un utilisateur.
+     * Retourne une liste de tableaux : [taskLabel, durationMs, goalMin, createdAt]
+     */
+    public java.util.List<String[]> getChronoSessionsLast24h(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        long since = System.currentTimeMillis() - 24L * 60 * 60 * 1000;
+
+        Cursor c = db.query(
+                PlanexiaDatabaseHelper.T_CHRONO_SESSIONS,
+                new String[]{
+                        PlanexiaDatabaseHelper.C_TASK_LABEL,
+                        PlanexiaDatabaseHelper.C_DURATION_MS,
+                        PlanexiaDatabaseHelper.C_GOAL_MIN,
+                        PlanexiaDatabaseHelper.C_CREATED_AT
+                },
+                PlanexiaDatabaseHelper.C_USER_ID + " = ? AND " +
+                        PlanexiaDatabaseHelper.C_CREATED_AT + " >= ?",
+                new String[]{String.valueOf(userId), String.valueOf(since)},
+                null, null,
+                PlanexiaDatabaseHelper.C_CREATED_AT + " DESC"
+        );
+
+        java.util.List<String[]> result = new java.util.ArrayList<>();
+        while (c.moveToNext()) {
+            result.add(new String[]{
+                    c.getString(0),               // taskLabel
+                    String.valueOf(c.getLong(1)), // durationMs
+                    String.valueOf(c.getInt(2)),  // goalMin
+                    String.valueOf(c.getLong(3))  // createdAt
+            });
+        }
+        c.close();
+        return result;
+    }
+
+    /** Supprimer les sessions de plus de 24h */
+    public void deleteOldChronoSessions(long userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long limit = System.currentTimeMillis() - 24L * 60 * 60 * 1000;
+        db.delete(
+                PlanexiaDatabaseHelper.T_CHRONO_SESSIONS,
+                PlanexiaDatabaseHelper.C_USER_ID + " = ? AND " +
+                        PlanexiaDatabaseHelper.C_CREATED_AT + " < ?",
+                new String[]{String.valueOf(userId), String.valueOf(limit)}
+        );
+    }
 }

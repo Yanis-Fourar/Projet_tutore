@@ -1,5 +1,8 @@
 package com.example.planexia.ui.tasks;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextUtils;
@@ -9,13 +12,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import com.google.android.material.card.MaterialCardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.planexia.ChronoActivity;
 import com.example.planexia.R;
+import com.example.planexia.data.PlanexiaRepository;
+import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Task;
+import com.example.planexia.ui.PremiumDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.time.LocalDate;
@@ -74,10 +82,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 && !today.isEmpty()
                 && dueDate.compareTo(today) < 0;
 
-        // --- Fond transparent sur itemView pour éviter la double bordure ---
         holder.itemView.setBackgroundColor(Color.TRANSPARENT);
 
-        // --- Titre ---
+        // Titre
         holder.tvTaskTitle.setText(task.getTitle());
         if (task.isDone()) {
             holder.tvTaskTitle.setPaintFlags(holder.tvTaskTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -87,7 +94,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.tvTaskTitle.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#1A1A2E"));
         }
 
-        // --- Bordure uniquement sur la CardView ---
+        // Bordure card
         if (holder.cardTask != null) {
             if (isLate && !task.isDone()) {
                 holder.cardTask.setCardBackgroundColor(Color.parseColor("#FFF5F5"));
@@ -99,14 +106,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         }
 
-        // --- Sous-titre : Module • ressource ---
-        String subtitle = TextUtils.isEmpty(task.getModuleName()) ? "" : task.getModuleName();
-        if (!TextUtils.isEmpty(task.getResourceText())) {
-            subtitle += (subtitle.isEmpty() ? "" : " • ") + task.getResourceText();
+        // Sous-titre
+        // Sous-titre : Module • Date (ex: "Mathématiques • 3 déc.")
+        StringBuilder sb = new StringBuilder();
+        if (!TextUtils.isEmpty(task.getModuleName())) {
+            sb.append(task.getModuleName());
         }
-        holder.tvTaskSubtitle.setText(subtitle);
+        if (!TextUtils.isEmpty(dueDate)) {
+            String dateFormatted = formatDueDate(dueDate);
+            if (!TextUtils.isEmpty(dateFormatted)) {
+                if (sb.length() > 0) sb.append(" • ");
+                sb.append(dateFormatted);
+            }
+        }
+        holder.tvTaskSubtitle.setText(sb.toString());
 
-        // --- Barre colorée latérale ---
+        // Barre colorée
         String moduleColor = task.getModuleColor();
         try {
             holder.viewColorBar.setBackgroundColor(Color.parseColor(moduleColor));
@@ -114,7 +129,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.viewColorBar.setBackgroundColor(Color.parseColor("#7B1FA2"));
         }
 
-        // --- Icône chrono ---
+        // Icône chrono
         if (task.isDone()) {
             holder.ivChronoBadge.setColorFilter(Color.parseColor("#BBBBBB"));
         } else if (isLate) {
@@ -123,7 +138,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.ivChronoBadge.setColorFilter(Color.parseColor("#CCCCCC"));
         }
 
-        // --- Clic = cocher/décocher ---
+        // Clic = cocher/décocher
         holder.itemView.setOnClickListener(v -> {
             boolean newState = !task.isDone();
             task.setDone(newState);
@@ -131,21 +146,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             if (checkedListener != null) checkedListener.onChecked(task.getId(), newState);
         });
 
-        // --- Appui long = BottomSheet modifier/supprimer ---
+        // Appui long = BottomSheet
         holder.itemView.setOnLongClickListener(v -> {
             showOptionsBottomSheet(v, task);
             return true;
         });
 
-        // --- En-tête de date masqué ---
         holder.layoutDateHeader.setVisibility(View.GONE);
     }
 
     private void showOptionsBottomSheet(View anchor, Task task) {
-        BottomSheetDialog sheet = new BottomSheetDialog(anchor.getContext(),
+        Context ctx = anchor.getContext();
+        BottomSheetDialog sheet = new BottomSheetDialog(ctx,
                 com.google.android.material.R.style.Theme_Design_BottomSheetDialog);
 
-        View sheetView = LayoutInflater.from(anchor.getContext())
+        View sheetView = LayoutInflater.from(ctx)
                 .inflate(R.layout.bottom_sheet_task_options, null);
         sheet.setContentView(sheetView);
 
@@ -156,6 +171,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         TextView tvTitle = sheetView.findViewById(R.id.tvBottomSheetTaskTitle);
         if (tvTitle != null) tvTitle.setText(task.getTitle());
 
+        // Bouton Modifier
         LinearLayout btnEdit = sheetView.findViewById(R.id.btnBottomSheetEdit);
         if (btnEdit != null) {
             btnEdit.setOnClickListener(v -> {
@@ -164,6 +180,38 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             });
         }
 
+        // Bouton Mode Chrono
+        LinearLayout btnChrono = sheetView.findViewById(R.id.btnBottomSheetChrono);
+        if (btnChrono != null) {
+            btnChrono.setOnClickListener(v -> {
+                sheet.dismiss();
+                // Vérifier premium
+                SharedPreferences prefs = ctx.getSharedPreferences("planexia_session", Context.MODE_PRIVATE);
+                boolean isPremium = prefs.getBoolean("is_premium", false);
+                if (!isPremium) {
+                    long userId = new SessionManager(ctx).getUserId();
+                    isPremium = new PlanexiaRepository(ctx).isPremium(userId);
+                }
+
+                if (isPremium) {
+                    // Lancer le chrono avec la tâche
+                    Intent intent = new Intent(ctx, ChronoActivity.class);
+                    intent.putExtra("task_id", task.getId());
+                    intent.putExtra("task_title", task.getTitle());
+                    intent.putExtra("task_module", task.getModuleName());
+                    ctx.startActivity(intent);
+                } else {
+                    // Proposer le Premium
+                    if (ctx instanceof android.app.Activity) {
+                        PremiumDialog.show((android.app.Activity) ctx, null);
+                    } else {
+                        Toast.makeText(ctx, "Cette fonctionnalité est réservée aux membres Premium ✦", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+
+        // Bouton Supprimer
         LinearLayout btnDelete = sheetView.findViewById(R.id.btnBottomSheetDelete);
         if (btnDelete != null) {
             btnDelete.setOnClickListener(v -> {
@@ -196,4 +244,23 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             cardTask         = itemView.findViewById(R.id.cardTask);
         }
     }
+
+    /** Convertit "2025-12-03" en "3 déc." */
+    private static String formatDueDate(String rawDate) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                java.time.LocalDate date = java.time.LocalDate.parse(rawDate);
+                String[] months = {"jan.", "fév.", "mars", "avr.", "mai", "juin",
+                        "juil.", "août", "sep.", "oct.", "nov.", "déc."};
+                return date.getDayOfMonth() + " " + months[date.getMonthValue() - 1];
+            } else {
+                java.text.SimpleDateFormat sdfIn  = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
+                java.text.SimpleDateFormat sdfOut = new java.text.SimpleDateFormat("d MMM", java.util.Locale.FRENCH);
+                java.util.Date d = sdfIn.parse(rawDate);
+                if (d != null) return sdfOut.format(d);
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
+
 }

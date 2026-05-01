@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#7B3FC8">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp">
+
+            <!-- HEADER -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="24dp">
+                <ImageButton android:id="@+id/btnBack" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_arrow_back" android:background="?attr/selectableItemBackgroundBorderless" android:tint="#FFFFFF"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Mode Chrono" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" android:gravity="center"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✦" android:textColor="#FFD700" android:textSize="20sp"/>
+            </LinearLayout>
+
+            <!-- CERCLE CHRONO -->
+            <FrameLayout android:layout_width="220dp" android:layout_height="220dp" android:layout_gravity="center_horizontal" android:layout_marginBottom="20dp">
+                <View android:layout_width="220dp" android:layout_height="220dp" android:background="@drawable/bg_chrono_circle"/>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center">
+                    <TextView android:id="@+id/tvChronoTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="00:00" android:textColor="#FFFFFF" android:textSize="52sp" android:textStyle="bold" android:fontFamily="monospace"/>
+                    <TextView android:id="@+id/tvSessionStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Choisir un objectif…" android:textColor="#E0D0FF" android:textSize="12sp"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- CARTE TÂCHE EN COURS -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardCurrentTask"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#8B52D4">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                        <View android:layout_width="10dp" android:layout_height="10dp" android:background="@drawable/circle_dot_purple" android:layout_marginEnd="10dp"/>
+                        <TextView android:id="@+id/tvCurrentTask" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Session d'étude" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="En cours" android:textColor="#FFFFFF" android:textSize="10sp" android:background="#9B6FDD" android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="3dp" android:paddingBottom="3dp"/>
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvCurrentModule" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textColor="#CCBBFF" android:textSize="12sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- BOUTONS -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center" android:layout_marginBottom="28dp">
+                <ImageButton android:id="@+id/btnPause" android:layout_width="64dp" android:layout_height="64dp" android:src="@android:drawable/ic_media_play" android:background="@drawable/bg_circle_purple_btn" android:tint="#FFFFFF" android:layout_marginEnd="20dp"/>
+                <ImageButton android:id="@+id/btnStop" android:layout_width="52dp" android:layout_height="52dp" android:src="@android:drawable/ic_media_previous" android:background="@drawable/bg_avatar_circle" android:tint="#FFFFFF" android:layout_marginEnd="20dp"/>
+                <ImageButton android:id="@+id/btnReset" android:layout_width="52dp" android:layout_height="52dp" android:src="@android:drawable/ic_menu_rotate" android:background="@drawable/bg_avatar_circle" android:tint="#FFFFFF"/>
+            </LinearLayout>
+
+            <!-- STATS -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="20dp">
+                <androidx.cardview.widget.CardView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="8dp" app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#8B52D4">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:padding="14dp">
+                        <TextView android:id="@+id/tvSessionCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sessions" android:textColor="#CCBBFF" android:textSize="11sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="8dp" app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#8B52D4">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:padding="14dp">
+                        <TextView android:id="@+id/tvTodayTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0min" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Aujourd'hui" android:textColor="#CCBBFF" android:textSize="11sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#8B52D4">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:padding="14dp">
+                        <TextView android:id="@+id/tvGoalPercent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0%" android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Objectif" android:textColor="#CCBBFF" android:textSize="11sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- HISTORIQUE placeholder -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Historique" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Voir tout" android:textColor="#CCBBFF" android:textSize="13sp"/>
+            </LinearLayout>
+            <LinearLayout android:id="@+id/historyContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/card_background"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
