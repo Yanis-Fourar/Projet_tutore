@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="24dp">
+
+    <!-- Icône + titre -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⭐"
+            android:textSize="26sp"
+            android:layout_marginEnd="10dp"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Passer Premium"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#1F1F1F"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Débloquez toutes les fonctionnalités"
+                android:textSize="13sp"
+                android:textColor="#888888"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Séparateur -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F0EBF8"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Liste des fonctionnalités -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✅  Matières illimitées"
+        android:textSize="14sp"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="8dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✅  Statistiques avancées"
+        android:textSize="14sp"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="8dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✅  Graphiques temps réel"
+        android:textSize="14sp"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="8dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✅  Analyse hebdomadaire et mensuelle"
+        android:textSize="14sp"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="8dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✅  Répartition détaillée par matière"
+        android:textSize="14sp"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Bouton mensuel -->
+    <Button
+        android:id="@+id/btnMonthly"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="2,99 € / mois"
+        android:textAllCaps="false"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#6C3FC5"
+        app:cornerRadius="14dp"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- Bouton annuel -->
+    <Button
+        android:id="@+id/btnYearly"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="20,00 € / an  — économisez 36 %"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#6C3FC5"
+        android:backgroundTint="#F0EBF8"
+        app:cornerRadius="14dp"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- Bouton annuler -->
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="Non merci"
+        android:textAllCaps="false"
+        android:textSize="13sp"
+        android:textColor="#888888"
+        android:backgroundTint="@android:color/transparent"
+        app:cornerRadius="14dp"/>
+
+</LinearLayout>

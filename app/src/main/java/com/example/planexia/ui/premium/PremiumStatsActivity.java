@@ -15,6 +15,7 @@ import androidx.cardview.widget.CardView;
 import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Module;
+import com.example.planexia.ui.PremiumDialog;
 
 import java.util.List;
 
@@ -30,10 +31,17 @@ public class PremiumStatsActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
         userId = prefs.getLong("user_id", -1);
+        boolean isPremium = prefs.getBoolean("is_premium", false);
 
         repository = new PlanexiaRepository(this);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        // Sécurité : si l'utilisateur n'est pas premium, afficher le dialog d'achat
+        if (!isPremium) {
+            PremiumDialog.show(this, () -> loadData());
+            return;
+        }
 
         loadData();
     }

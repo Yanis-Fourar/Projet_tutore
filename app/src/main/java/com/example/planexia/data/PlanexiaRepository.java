@@ -30,6 +30,33 @@ public class PlanexiaRepository {
         return db.insert(PlanexiaDatabaseHelper.T_USERS, null, values);
     }
 
+    public boolean isPremium(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(
+                PlanexiaDatabaseHelper.T_USERS,
+                new String[]{PlanexiaDatabaseHelper.C_IS_PREMIUM},
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(userId)},
+                null, null, null
+        );
+        boolean premium = false;
+        if (c.moveToFirst()) premium = c.getInt(0) == 1;
+        c.close();
+        return premium;
+    }
+
+    public void setPremium(long userId, boolean premium) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(PlanexiaDatabaseHelper.C_IS_PREMIUM, premium ? 1 : 0);
+        db.update(
+                PlanexiaDatabaseHelper.T_USERS,
+                values,
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(userId)}
+        );
+    }
+
     public long login(String email, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(

@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Module;
+import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.ui.modules.ModulesActivity;
 import com.example.planexia.ui.premium.HelpSupportActivity;
 import com.example.planexia.ui.premium.PremiumStatsActivity;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ProgressionActivity extends AppCompatActivity {
 
     private PlanexiaRepository repository;
+    private SharedPreferences prefs;
     private long userId = -1;
 
     @Override
@@ -34,17 +36,33 @@ public class ProgressionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progression);
 
-        SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
+        prefs  = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
         userId = prefs.getLong("user_id", -1);
 
         repository = new PlanexiaRepository(this);
 
         loadData();
         setupBottomNav();
+        setupPremiumButtons();
+    }
 
-        findViewById(R.id.btnPremiumStats).setOnClickListener(v ->
-                startActivity(new Intent(this, PremiumStatsActivity.class)));
+    private void setupPremiumButtons() {
+        // Bouton Statistiques avancées :
+        // Si déjà premium → ouvre directement l'écran stats
+        // Sinon → affiche le dialog d'achat, puis ouvre l'écran stats après activation
+        findViewById(R.id.btnPremiumStats).setOnClickListener(v -> {
+            if (prefs.getBoolean("is_premium", false)) {
+                startActivity(new Intent(this, PremiumStatsActivity.class));
+            } else {
+                PremiumDialog.show(this, () -> {
+                    // Après activation : ouvrir les stats + cacher la bannière premium
+                    startActivity(new Intent(this, PremiumStatsActivity.class));
+                    loadData(); // recharge pour masquer la bannière si besoin
+                });
+            }
+        });
 
+        // Bouton Aide & Support : toujours accessible, pas de condition premium
         findViewById(R.id.btnHelpSupport).setOnClickListener(v ->
                 startActivity(new Intent(this, HelpSupportActivity.class)));
     }
