@@ -64,8 +64,8 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
-        SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", -1);
+        SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
+        userId = prefs.getLong("user_id", 1);
 
         repository = new PlanexiaRepository(this);
 

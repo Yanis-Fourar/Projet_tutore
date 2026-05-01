@@ -66,8 +66,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.tvTaskTitle.setTextColor(isLate ? Color.parseColor("#F44336") : Color.parseColor("#1A1A2E"));
         }
 
-        // --- Sous-titre : Module • ressource ---
+        // --- Sous-titre : Module • Objectif • ressource ---
         String subtitle = TextUtils.isEmpty(task.getModuleName()) ? "" : task.getModuleName();
+        if (!TextUtils.isEmpty(task.getObjectiveName())) {
+            subtitle += (subtitle.isEmpty() ? "" : " • ") + task.getObjectiveName();
+        }
         if (!TextUtils.isEmpty(task.getResourceText())) {
             subtitle += (subtitle.isEmpty() ? "" : " • ") + task.getResourceText();
         }
