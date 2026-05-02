@@ -178,6 +178,7 @@ public class ChronoService extends Service {
 
                 Intent tick = new Intent(ACTION_TICK);
                 tick.putExtra(EXTRA_ELAPSED, elapsedTime);
+                tick.setPackage(getPackageName());
                 sendBroadcast(tick);
 
                 if (goalMs > 0 && elapsedTime >= goalMs && !goalReached) {
@@ -199,7 +200,9 @@ public class ChronoService extends Service {
         // 2. Notification persistante avec bouton "Arrêter"
         showDoneNotification();
         // 3. Broadcast → Activity si elle est ouverte en premier plan
-        sendBroadcast(new Intent(ACTION_GOAL_REACHED));
+        Intent goalIntent = new Intent(ACTION_GOAL_REACHED);
+        goalIntent.setPackage(getPackageName());
+        sendBroadcast(goalIntent);
         // 4. Retirer la notif "chrono en cours"
         stopForeground(true);
     }
