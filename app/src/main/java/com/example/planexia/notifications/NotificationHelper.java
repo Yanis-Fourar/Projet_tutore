@@ -89,11 +89,23 @@ public class NotificationHelper {
         PendingIntent pi = PendingIntent.getBroadcast(context, alarmId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         if (am == null) return;
-        // setExactAndAllowWhileIdle car setRepeating est inexact sur Android 6+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
-        } else {
-            am.setRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
+        try {
+            // Sur Android 12+, SCHEDULE_EXACT_ALARM nécessite l'accord de l'utilisateur
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (am.canScheduleExactAlarms()) {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+                } else {
+                    // Permission non accordée → alarme inexacte (ne crash pas)
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+            } else {
+                am.setRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
+            }
+        } catch (SecurityException e) {
+            // Fallback si la permission est refusée : alarme inexacte
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
         }
     }
 

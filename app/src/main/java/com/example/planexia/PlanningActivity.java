@@ -4,13 +4,15 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Task;
+import androidx.cardview.widget.CardView;
+import com.example.planexia.data.PlanexiaRepository;
+import com.example.planexia.data.SessionManager;
 import com.example.planexia.ui.PremiumDialog;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -71,10 +73,12 @@ public class PlanningActivity extends AppCompatActivity {
         bottomNav        = findViewById(R.id.bottomNavigationView);
 
         Button btnPremium = findViewById(R.id.btnDebloquerPremium);
-        btnPremium.setOnClickListener(v -> PremiumDialog.show(this, () -> hidePremiumBanners()));
 
-        Button btnIA = findViewById(R.id.btnIA);
-        if (btnIA != null) btnIA.setOnClickListener(v -> onIAClicked());
+        // ← MODIFIÉ : brancher le popup Premium
+        btnPremium.setOnClickListener(v ->
+                PremiumDialog.show(this, () -> hidePremiumBanners())
+        );
+
     }
 
     private void setupToggle() {
@@ -132,16 +136,8 @@ public class PlanningActivity extends AppCompatActivity {
     private void loadSemaineMode() {
         String today = getTodayString();
         List<PlanningTaskAdapter.PlanningTask> result = new ArrayList<>();
-
-        Calendar cal = Calendar.getInstance();
-        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        int daysToMonday = (dayOfWeek == Calendar.SUNDAY) ? -6 : (Calendar.MONDAY - dayOfWeek);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         for (int i = 0; i < 7; i++) {
-            Calendar dayCal = Calendar.getInstance();
-            dayCal.add(Calendar.DAY_OF_YEAR, daysToMonday + i);
-            String date = sdf.format(dayCal.getTime());
+            String date = getDateString(i);
             List<Task> tasks = repository.getTasksForDateWithModule(session.getUserId(), date);
             result.addAll(toPlanning(tasks, today));
         }
@@ -158,7 +154,6 @@ public class PlanningActivity extends AppCompatActivity {
             boolean isToday = dueDate.equals(todayStr);
             result.add(new PlanningTaskAdapter.PlanningTask(
                     t.getTitle(),
-                    t.getObjectiveName() != null ? t.getObjectiveName() : "",
                     t.getModuleName() != null ? t.getModuleName() : "",
                     0, label,
                     isToday && isFirstOfGroup,
@@ -224,18 +219,17 @@ public class PlanningActivity extends AppCompatActivity {
         }
     }
 
+
     private void hidePremiumBanners() {
+        SessionManager sm = new SessionManager(this);
         PlanexiaRepository repo = new PlanexiaRepository(this);
         boolean isPremium = getSharedPreferences("planexia_session", MODE_PRIVATE)
                 .getBoolean("is_premium", false)
-                || repo.isPremium(session.getUserId());
+                || repo.isPremium(sm.getUserId());
         if (isPremium) {
-            CardView cardChrono = findViewById(R.id.cardBannerChrono);
+            androidx.cardview.widget.CardView cardChrono = findViewById(R.id.cardBannerChrono);
             if (cardChrono != null) cardChrono.setVisibility(android.view.View.GONE);
         }
     }
 
-    private void onIAClicked() {
-        // TODO : lancer la génération IA du planning
-    }
 }

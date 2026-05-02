@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,7 +20,6 @@ import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.ui.modules.ModulesActivity;
-import com.example.planexia.ui.premium.HelpSupportActivity;
 import com.example.planexia.ui.premium.PremiumStatsActivity;
 import com.example.planexia.ui.tasks.TasksActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -29,7 +29,6 @@ import java.util.List;
 public class ProgressionActivity extends AppCompatActivity {
 
     private PlanexiaRepository repository;
-    private SharedPreferences prefs;
     private long userId = -1;
 
     @Override
@@ -37,36 +36,12 @@ public class ProgressionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progression);
 
-        prefs  = getSharedPreferences("planexia_session", MODE_PRIVATE);
-        userId = new SessionManager(this).getUserId();
+        userId     = new SessionManager(this).getUserId();
         repository = new PlanexiaRepository(this);
 
         loadData();
-        setupPremiumButtons();
+        setupPremiumButton();
         setupBottomNav();
-    }
-
-    private void setupPremiumButtons() {
-        View btnStats = findViewById(R.id.btnPremiumStats);
-        if (btnStats != null) {
-            btnStats.setOnClickListener(v -> {
-                boolean isPremium = prefs.getBoolean("is_premium", false)
-                        || repository.isPremium(userId);
-                if (isPremium) {
-                    startActivity(new Intent(this, PremiumStatsActivity.class));
-                } else {
-                    PremiumDialog.show(this, () -> {
-                        startActivity(new Intent(this, PremiumStatsActivity.class));
-                        loadData();
-                    });
-                }
-            });
-        }
-
-        View btnHelp = findViewById(R.id.btnHelpSupport);
-        if (btnHelp != null) {
-            btnHelp.setOnClickListener(v -> startActivity(new Intent(this, HelpSupportActivity.class)));
-        }
     }
 
     @Override
@@ -77,7 +52,30 @@ public class ProgressionActivity extends AppCompatActivity {
         if (btnPremiumStats != null) updateStatsButtonText(btnPremiumStats);
     }
 
-    private void updateStatsButtonText(android.widget.Button btn) {
+    private void setupPremiumButton() {
+        Button btnPremiumStats = findViewById(R.id.btnPremiumStats);
+        if (btnPremiumStats == null) return;
+
+        updateStatsButtonText(btnPremiumStats);
+
+        btnPremiumStats.setOnClickListener(v -> {
+            SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
+            boolean isPremium = prefs.getBoolean("is_premium", false)
+                    || repository.isPremium(userId);
+
+            if (isPremium) {
+                startActivity(new Intent(this, PremiumStatsActivity.class));
+            } else {
+                PremiumDialog.show(this, () -> {
+                    updateStatsButtonText(btnPremiumStats);
+                    startActivity(new Intent(this, PremiumStatsActivity.class));
+                });
+            }
+        });
+    }
+
+    private void updateStatsButtonText(Button btn) {
+        SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
         boolean isPremium = prefs.getBoolean("is_premium", false)
                 || repository.isPremium(userId);
         btn.setText(isPremium ? "Voir les statistiques avancées" : "Débloquer les statistiques ✦");
@@ -157,9 +155,7 @@ public class ProgressionActivity extends AppCompatActivity {
             } else if (id == R.id.nav_planning) {
                 startActivity(new Intent(this, com.example.planexia.PlanningActivity.class)); finish(); return true;
             } else if (id == R.id.nav_profil) {
-                startActivity(new Intent(this, com.example.planexia.ProfileActivity.class));
-                finish();
-                return true;
+                startActivity(new Intent(this, com.example.planexia.ProfileActivity.class)); finish(); return true;
             }
             return false;
         });

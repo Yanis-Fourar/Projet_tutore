@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
@@ -24,7 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Planexia">
 
-        <!-- Premier écran lancé au démarrage -->
+        <!-- ===== AUTH FLOW ===== -->
         <activity
             android:name=".OnboardingActivity"
             android:exported="true">
@@ -34,32 +31,38 @@
             </intent-filter>
         </activity>
 
-        <!-- Auth -->
-        <activity android:name=".WelcomeActivity"  android:exported="false" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".LoginActivity"    android:exported="false" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".RegisterActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".WelcomeActivity"  android:exported="false" />
+        <activity android:name=".LoginActivity"    android:exported="false" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
 
-        <!-- Profil + Paramètres -->
+        <!-- ===== APP PRINCIPALE ===== -->
+        <activity android:name=".MainActivity"     android:exported="false" />
+        <activity android:name=".PlanningActivity" android:exported="false" />
+
+        <activity android:name=".ui.modules.ModulesActivity" />
+        <activity android:name=".ui.modules.AddModuleActivity" />
+        <activity android:name=".ui.objectives.ObjectivesActivity" />
+        <activity android:name=".ui.objectives.AddObjectiveActivity" />
+        <activity android:name=".ui.tasks.TasksActivity" />
+        <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
+        <activity android:name=".ui.progression.ProgressionActivity" />
         <activity android:name=".ProfileActivity"    android:exported="false" />
         <activity android:name=".ParametresActivity" android:exported="false" />
 
-        <!-- App principale -->
-        <activity android:name=".PlanningActivity"                    android:exported="false" />
-        <activity android:name=".ui.modules.ModulesActivity"          android:exported="false" />
-        <activity android:name=".ui.modules.AddModuleActivity"        android:exported="false" />
-        <activity android:name=".ui.objectives.ObjectivesActivity"    android:exported="false" />
-        <activity android:name=".ui.objectives.AddObjectiveActivity"  android:exported="false" />
-        <activity android:name=".ui.tasks.TasksActivity"              android:exported="false" />
-        <activity android:name=".ui.tasks.ObjectiveDetailActivity"    android:exported="false" />
-        <activity android:name=".ui.progression.ProgressionActivity"  android:exported="false" />
-
-        <!-- Premium -->
+        <!-- ===== PREMIUM ===== -->
         <activity android:name=".ui.premium.PremiumStatsActivity" android:exported="false" />
         <activity android:name=".ui.premium.HelpSupportActivity"  android:exported="false" />
 
-        <!-- Chrono -->
-        <activity android:name=".ChronoActivity" android:exported="false" android:launchMode="singleTop"/>
-        <service  android:name=".ChronoService"  android:exported="false" android:foregroundServiceType="mediaPlayback"/>
+        <!-- ===== CHRONO ===== -->
+        <activity
+            android:name=".ChronoActivity"
+            android:exported="false"
+            android:launchMode="singleTop"/>
+
+        <service
+            android:name=".ChronoService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"/>
 
         <!-- ===== NOTIFICATIONS ===== -->
         <activity android:name=".notifications.NotificationsActivity" android:exported="false"/>
@@ -68,16 +71,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.planexia.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
 
     </application>
 

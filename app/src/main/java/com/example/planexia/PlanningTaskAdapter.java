@@ -30,18 +30,16 @@ public class PlanningTaskAdapter extends RecyclerView.Adapter<PlanningTaskAdapte
 
     // Modèle interne d'une tâche à afficher dans le planning
     public static class PlanningTask {
-        public String title;           // Titre de la tâche
-        public String objectiveName;   // Nom de l'objectif associé
-        public String moduleName;      // Nom du module associé
-        public int durationMin;        // Durée estimée en minutes (0 si inconnue)
-        public String dateLabel;       // Ex: "Mercredi 03/12/2025" — null si même groupe que précédent
-        public boolean isToday;        // True si la date correspond à aujourd'hui
-        public boolean isDone;         // True si la tâche est déjà cochée
+        public String title;       // Titre de la tâche
+        public String moduleName;  // Nom du module associé
+        public int durationMin;    // Durée estimée en minutes (0 si inconnue)
+        public String dateLabel;   // Ex: "Mercredi 03/12/2025" — null si même groupe que précédent
+        public boolean isToday;    // True si la date correspond à aujourd'hui
+        public boolean isDone;     // True si la tâche est déjà cochée
 
-        public PlanningTask(String title, String objectiveName, String moduleName, int durationMin,
+        public PlanningTask(String title, String moduleName, int durationMin,
                             String dateLabel, boolean isToday, boolean isDone) {
             this.title = title;
-            this.objectiveName = objectiveName;
             this.moduleName = moduleName;
             this.durationMin = durationMin;
             this.dateLabel = dateLabel;
@@ -96,8 +94,8 @@ public class PlanningTaskAdapter extends RecyclerView.Adapter<PlanningTaskAdapte
         // --- Titre de la tâche ---
         holder.tvTaskTitle.setText(task.title);
 
-        // --- Sous-titre : Objectif • Module ---
-        String subtitle = task.objectiveName + " • " + task.moduleName;
+        // --- Sous-titre : Module • durée ---
+        String subtitle = task.moduleName;
         if (task.durationMin > 0) {
             subtitle += " • " + task.durationMin + " min";
         }

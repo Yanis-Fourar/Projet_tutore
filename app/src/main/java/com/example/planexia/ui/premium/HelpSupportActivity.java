@@ -36,7 +36,6 @@ public class HelpSupportActivity extends AppCompatActivity {
         View header    = findViewById(headerId);
         View content   = findViewById(contentId);
         TextView arrow = findViewById(arrowId);
-
         header.setOnClickListener(v -> {
             boolean visible = content.getVisibility() == View.VISIBLE;
             content.setVisibility(visible ? View.GONE : View.VISIBLE);

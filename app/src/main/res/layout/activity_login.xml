@@ -11,6 +11,17 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+        <!-- Bouton retour -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_purple_btn"
+            android:src="@drawable/ic_arrow_back"
+            android:padding="10dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="Retour" />
+
         <!-- Logo centré -->
         <ImageView
             android:layout_width="76dp"

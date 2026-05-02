@@ -21,8 +21,8 @@
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back"
             android:contentDescription="Retour"
@@ -313,7 +313,7 @@
                     <Button
                         android:id="@+id/btnEmail"
                         android:layout_width="wrap_content"
-                        android:layout_height="38dp"
+                        android:layout_height="48dp"
                         android:text="Écrire"
                         android:textAllCaps="false"
                         android:textSize="13sp"

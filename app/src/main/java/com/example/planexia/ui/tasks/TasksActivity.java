@@ -5,10 +5,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -31,6 +28,10 @@ import com.example.planexia.model.Objective;
 import com.example.planexia.model.Task;
 import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.util.PdfExporter;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import java.util.concurrent.Executors;
 import com.example.planexia.ui.modules.ModulesActivity;
 import com.example.planexia.ui.progression.ProgressionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -46,7 +47,6 @@ public class TasksActivity extends AppCompatActivity {
     private TextView tvTodo;
     private TextView tvDone;
     private TextView tvSubtitle;
-    private androidx.cardview.widget.CardView bannerExportPdf;
 
     private List<Task> allTasks;
     private List<Task> displayedTasks;
@@ -65,22 +65,25 @@ public class TasksActivity extends AppCompatActivity {
         userId = new com.example.planexia.data.SessionManager(this).getUserId();
         repository = new PlanexiaRepository(this);
 
-        recyclerView    = findViewById(R.id.recyclerViewTasks);
-        tvTodo          = findViewById(R.id.tvTodoCount);
-        tvDone          = findViewById(R.id.tvDoneCount);
-        bannerExportPdf = findViewById(R.id.bannerExportPdf);
+        recyclerView = findViewById(R.id.recyclerViewTasks);
+        tvTodo       = findViewById(R.id.tvTodoCount);
+        tvDone       = findViewById(R.id.tvDoneCount);
 
         CardView btnAdd = findViewById(R.id.btnAddTask);
         if (btnAdd != null) btnAdd.setOnClickListener(v -> showAddTaskDialog());
 
         Button btnExportPDF = findViewById(R.id.btnDecouvrirExportPDF);
         if (btnExportPDF != null) {
-            if (repository.isPremium(userId)) btnExportPDF.setText("Exporter en PDF");
+            // Texte du bouton selon statut premium
+            if (repository.isPremium(userId)) {
+                btnExportPDF.setText("Exporter en PDF");
+            }
             btnExportPDF.setOnClickListener(v -> {
                 if (repository.isPremium(userId)) {
                     exportPdf();
                 } else {
                     PremiumDialog.show(this, () -> {
+                        // Après activation premium : changer le texte et exporter
                         btnExportPDF.setText("Exporter en PDF");
                         exportPdf();
                     });
@@ -135,15 +138,6 @@ public class TasksActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadTasks();
-        updateExportBanner();
-    }
-
-    private void updateExportBanner() {
-        if (bannerExportPdf != null) {
-            bannerExportPdf.setVisibility(
-                    repository.isPremium(userId) ? android.view.View.GONE : android.view.View.VISIBLE
-            );
-        }
     }
 
     private void loadTasks() {
@@ -152,27 +146,6 @@ public class TasksActivity extends AppCompatActivity {
         applyFilter(currentFilter);
         updateCounts();
     }
-
-    private void exportPdf() {
-        if (allTasks.isEmpty()) {
-            Toast.makeText(this, "Aucune tâche à exporter", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Toast.makeText(this, "Génération du PDF…", Toast.LENGTH_SHORT).show();
-        Handler handler = new Handler(Looper.getMainLooper());
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                Uri uri = PdfExporter.export(this, allTasks);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, "application/pdf");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                handler.post(() -> startActivity(Intent.createChooser(intent, "Ouvrir le PDF")));
-            } catch (Exception e) {
-                handler.post(() -> Toast.makeText(this, "Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show());
-            }
-        });
-    }
-
 
     private void showAddTaskDialog() {
         List<Module> modules = repository.getModulesByUser(userId);
@@ -508,6 +481,26 @@ public class TasksActivity extends AppCompatActivity {
         if (tvDone != null) tvDone.setText(String.valueOf(done));
         if (tvSubtitle != null)
             tvSubtitle.setText(todo + " tâche" + (todo > 1 ? "s" : "") + " active" + (todo > 1 ? "s" : ""));
+    }
+
+    private void exportPdf() {
+        if (allTasks.isEmpty()) {
+            Toast.makeText(this, "Aucune tâche à exporter", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(this, "Génération du PDF…", Toast.LENGTH_SHORT).show();
+        Handler handler = new Handler(Looper.getMainLooper());
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                Uri uri = PdfExporter.export(this, allTasks);
+                android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, "application/pdf");
+                intent.setFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                handler.post(() -> startActivity(android.content.Intent.createChooser(intent, "Ouvrir le PDF")));
+            } catch (Exception e) {
+                handler.post(() -> Toast.makeText(this, "Erreur : " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
     }
 
     private void setupBottomNav() {

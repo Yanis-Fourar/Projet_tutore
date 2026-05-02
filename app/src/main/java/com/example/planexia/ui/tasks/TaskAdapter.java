@@ -106,22 +106,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         }
 
-        // --- Sous-titre : Module • Objectif • ressource • Date ---
-        String subtitle = TextUtils.isEmpty(task.getModuleName()) ? "" : task.getModuleName();
-        if (!TextUtils.isEmpty(task.getObjectiveName())) {
-            subtitle += (subtitle.isEmpty() ? "" : " • ") + task.getObjectiveName();
-        }
-        if (!TextUtils.isEmpty(task.getResourceText())) {
-            subtitle += (subtitle.isEmpty() ? "" : " • ") + task.getResourceText();
+        // Sous-titre
+        // Sous-titre : Module • Date (ex: "Mathématiques • 3 déc.")
+        StringBuilder sb = new StringBuilder();
+        if (!TextUtils.isEmpty(task.getModuleName())) {
+            sb.append(task.getModuleName());
         }
         if (!TextUtils.isEmpty(dueDate)) {
             String dateFormatted = formatDueDate(dueDate);
             if (!TextUtils.isEmpty(dateFormatted)) {
-                if (!subtitle.isEmpty()) subtitle += " • ";
-                subtitle += dateFormatted;
+                if (sb.length() > 0) sb.append(" • ");
+                sb.append(dateFormatted);
             }
         }
-        holder.tvTaskSubtitle.setText(subtitle);
+        holder.tvTaskSubtitle.setText(sb.toString());
 
         // Barre colorée
         String moduleColor = task.getModuleColor();

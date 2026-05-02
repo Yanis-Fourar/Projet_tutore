@@ -7,9 +7,8 @@ public class Task {
     private boolean isDone;
     private String dueDate;       // format YYYY-MM-DD (peut être null)
     private String resourceText;  // lien / note / ressource (peut être null)
-    private String moduleName;     // nom du module parent (pour affichage dans la liste)
-    private String moduleColor;    // couleur hex du module parent
-    private String objectiveName;  // nom de l'objectif parent
+    private String moduleName;    // nom du module parent (pour affichage dans la liste)
+    private String moduleColor;   // couleur hex du module parent
 
     public Task(long id, String title, boolean isDone, String dueDate, String resourceText) {
         this.id = id;
@@ -19,7 +18,6 @@ public class Task {
         this.resourceText = resourceText;
         this.moduleName = "";
         this.moduleColor = "#7B1FA2";
-        this.objectiveName = "";
     }
 
     public Task(long id, String title, boolean isDone, String dueDate, String resourceText,
@@ -31,19 +29,6 @@ public class Task {
         this.resourceText = resourceText;
         this.moduleName = moduleName != null ? moduleName : "";
         this.moduleColor = moduleColor != null ? moduleColor : "#7B1FA2";
-        this.objectiveName = "";
-    }
-
-    public Task(long id, String title, boolean isDone, String dueDate, String resourceText,
-                String moduleName, String moduleColor, String objectiveName) {
-        this.id = id;
-        this.title = title;
-        this.isDone = isDone;
-        this.dueDate = dueDate;
-        this.resourceText = resourceText;
-        this.moduleName = moduleName != null ? moduleName : "";
-        this.moduleColor = moduleColor != null ? moduleColor : "#7B1FA2";
-        this.objectiveName = objectiveName != null ? objectiveName : "";
     }
 
     // Constructeur simplifié (ajout rapide sans date ni ressource)
@@ -77,7 +62,4 @@ public class Task {
 
     public String getModuleColor() { return moduleColor; }
     public void setModuleColor(String moduleColor) { this.moduleColor = moduleColor != null ? moduleColor : "#7B1FA2"; }
-
-    public String getObjectiveName() { return objectiveName; }
-    public void setObjectiveName(String objectiveName) { this.objectiveName = objectiveName != null ? objectiveName : ""; }
 }

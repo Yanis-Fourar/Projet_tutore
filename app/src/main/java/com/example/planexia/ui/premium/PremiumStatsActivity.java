@@ -14,8 +14,8 @@ import androidx.cardview.widget.CardView;
 
 import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
+import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Module;
-import com.example.planexia.ui.PremiumDialog;
 
 import java.util.List;
 
@@ -29,20 +29,11 @@ public class PremiumStatsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_premium_stats);
 
-        SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", -1);
-        boolean isPremium = prefs.getBoolean("is_premium", false);
-
+        // Utiliser SessionManager comme ta version (planexia_session)
+        userId = new SessionManager(this).getUserId();
         repository = new PlanexiaRepository(this);
 
-        if (!isPremium && userId != -1) isPremium = repository.isPremium(userId);
-
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-
-        if (!isPremium) {
-            PremiumDialog.show(this, () -> loadData());
-            return;
-        }
 
         loadData();
     }
@@ -55,10 +46,10 @@ public class PremiumStatsActivity extends AppCompatActivity {
         int pendingTasks    = repository.getPendingTasksCount(userId);
         int totalObjectives = repository.getTotalObjectivesCount(userId);
 
-        setText(R.id.tvCompletionRate,   globalProgress + "%");
-        setText(R.id.tvDoneCount,        String.valueOf(doneTasks));
-        setText(R.id.tvPendingCount,     String.valueOf(pendingTasks));
-        setText(R.id.tvObjectivesCount,  String.valueOf(totalObjectives));
+        setText(R.id.tvCompletionRate,  globalProgress + "%");
+        setText(R.id.tvDoneCount,       String.valueOf(doneTasks));
+        setText(R.id.tvPendingCount,    String.valueOf(pendingTasks));
+        setText(R.id.tvObjectivesCount, String.valueOf(totalObjectives));
 
         buildModuleCards();
         buildBarChart();
@@ -92,7 +83,7 @@ public class PremiumStatsActivity extends AppCompatActivity {
             inner.setOrientation(LinearLayout.VERTICAL);
             inner.setPadding(dp(14), dp(14), dp(14), dp(14));
 
-            // Row: dot + name + coefficient badge
+            // Row 1 : dot + nom + coef
             LinearLayout row1 = new LinearLayout(this);
             row1.setOrientation(LinearLayout.HORIZONTAL);
             row1.setGravity(android.view.Gravity.CENTER_VERTICAL);
@@ -116,7 +107,7 @@ public class PremiumStatsActivity extends AppCompatActivity {
             tvCoef.setText("Coef. " + module.getCoefficient());
             tvCoef.setTextSize(11);
             tvCoef.setTextColor(Color.WHITE);
-            tvCoef.setBackground(getDrawable(R.drawable.bg_premium_button));
+            tvCoef.setBackground(getDrawable(R.drawable.bg_avatar_circle));
             tvCoef.setBackgroundTintList(ColorStateList.valueOf(color));
             tvCoef.setPadding(dp(8), dp(3), dp(8), dp(3));
 
@@ -124,7 +115,7 @@ public class PremiumStatsActivity extends AppCompatActivity {
             row1.addView(tvName);
             row1.addView(tvCoef);
 
-            // Row: done/total + objectives + percentage
+            // Row 2 : stats + %
             LinearLayout row2 = new LinearLayout(this);
             row2.setOrientation(LinearLayout.HORIZONTAL);
             row2.setPadding(0, 0, 0, dp(8));
@@ -144,7 +135,7 @@ public class PremiumStatsActivity extends AppCompatActivity {
             row2.addView(tvStats);
             row2.addView(tvPct);
 
-            // Progress bar
+            // Barre de progression
             ProgressBar pb = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
             pb.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(8)));
             pb.setMax(100);
