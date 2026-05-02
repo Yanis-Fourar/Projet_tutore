@@ -2,14 +2,12 @@ package com.example.planexia;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.data.SessionManager;
@@ -19,49 +17,19 @@ import java.util.List;
 
 public class ParametresActivity extends AppCompatActivity {
 
-    private static final String PREFS_PARAM = "planexia_param";
-    private static final String KEY_SON     = "son_enabled";
-
-    private SharedPreferences prefs;
     private SessionManager sessionManager;
-    private AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parametres);
 
-        prefs          = getSharedPreferences(PREFS_PARAM, MODE_PRIVATE);
         sessionManager = new SessionManager(this);
-        audioManager   = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
-        setupSon();
         setupClearData();
         setupDeleteAccount();
-    }
-
-    // ── Son ───────────────────────────────────────────────────────
-    private void setupSon() {
-        SwitchCompat swSon = findViewById(R.id.swSon);
-        swSon.setChecked(prefs.getBoolean(KEY_SON, true));
-        swSon.setOnCheckedChangeListener((btn, isChecked) -> {
-            prefs.edit().putBoolean(KEY_SON, isChecked).apply();
-            applySon(isChecked);
-            Toast.makeText(this,
-                    isChecked ? "Son activé" : "Son désactivé",
-                    Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void applySon(boolean enabled) {
-        if (audioManager == null) return;
-        try {
-            int stream = AudioManager.STREAM_MUSIC;
-            audioManager.setStreamVolume(stream,
-                    enabled ? audioManager.getStreamMaxVolume(stream) / 2 : 0, 0);
-        } catch (SecurityException ignored) {}
     }
 
     // ── Effacer données ───────────────────────────────────────────
@@ -104,7 +72,6 @@ public class ParametresActivity extends AppCompatActivity {
         repo.deleteUser(userId);
 
         sessionManager.clear();
-        // Effacer aussi le statut premium
         getSharedPreferences("planexia_session", MODE_PRIVATE)
                 .edit().clear().apply();
 
