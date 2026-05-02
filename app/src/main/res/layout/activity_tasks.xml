@@ -175,6 +175,7 @@
 
             <!-- BANNIÈRE EXPORT PDF -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/bannerExportPdf"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
@@ -220,12 +221,11 @@
 
                     </LinearLayout>
 
-                    <!-- ← AJOUT ID -->
                     <Button
                         android:id="@+id/btnDecouvrirExportPDF"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
-                        android:text="Découvrir"
+                        android:text="Exporter"
                         android:textColor="#FFFFFF"
                         android:textSize="12sp"
                         android:backgroundTint="#6C3FC5"

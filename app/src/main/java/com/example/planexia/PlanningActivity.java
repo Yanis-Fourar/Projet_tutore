@@ -132,8 +132,16 @@ public class PlanningActivity extends AppCompatActivity {
     private void loadSemaineMode() {
         String today = getTodayString();
         List<PlanningTaskAdapter.PlanningTask> result = new ArrayList<>();
+
+        Calendar cal = Calendar.getInstance();
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+        int daysToMonday = (dayOfWeek == Calendar.SUNDAY) ? -6 : (Calendar.MONDAY - dayOfWeek);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         for (int i = 0; i < 7; i++) {
-            String date = getDateString(i);
+            Calendar dayCal = Calendar.getInstance();
+            dayCal.add(Calendar.DAY_OF_YEAR, daysToMonday + i);
+            String date = sdf.format(dayCal.getTime());
             List<Task> tasks = repository.getTasksForDateWithModule(session.getUserId(), date);
             result.addAll(toPlanning(tasks, today));
         }
@@ -150,6 +158,7 @@ public class PlanningActivity extends AppCompatActivity {
             boolean isToday = dueDate.equals(todayStr);
             result.add(new PlanningTaskAdapter.PlanningTask(
                     t.getTitle(),
+                    t.getObjectiveName() != null ? t.getObjectiveName() : "",
                     t.getModuleName() != null ? t.getModuleName() : "",
                     0, label,
                     isToday && isFirstOfGroup,

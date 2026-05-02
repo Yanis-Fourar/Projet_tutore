@@ -142,9 +142,8 @@ public class PdfExporter {
                 cv[0].drawText(truncate(t.getTitle(), tTaskPaint, PAGE_W - MARGIN - tx - 70f), tx, ty, tTaskPaint);
                 ty += 14f;
 
-                // Ressource (remplace getObjectiveName — non disponible dans le modèle Task)
-                if (t.getResourceText() != null && !t.getResourceText().isEmpty()) {
-                    cv[0].drawText(truncate("Ressource : " + t.getResourceText(), detailPaint, PAGE_W - MARGIN - tx - 10f), tx, ty, detailPaint);
+                if (!t.getObjectiveName().isEmpty()) {
+                    cv[0].drawText(truncate("Objectif : " + t.getObjectiveName(), detailPaint, PAGE_W - MARGIN - tx - 10f), tx, ty, detailPaint);
                 }
                 ty += 14f;
 

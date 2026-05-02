@@ -26,6 +26,10 @@ public class PremiumDialog {
         if (dialog.getWindow() != null)
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(true);
+        dialog.getWindow().setLayout(
+                (int) (context.getResources().getDisplayMetrics().widthPixels * 0.92f),
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        );
 
         ImageButton btnClose = dialog.findViewById(R.id.btnClosePremium);
         if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
