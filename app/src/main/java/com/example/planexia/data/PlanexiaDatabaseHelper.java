@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class PlanexiaDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "planexia.db";
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 3;
 
     // Table names (contrat)
     public static final String T_USERS = "users";

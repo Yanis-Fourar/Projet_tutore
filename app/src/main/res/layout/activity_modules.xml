@@ -77,9 +77,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvModulesCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2/3 matières utilisées"
+                    android:text="0/3 matières utilisées"
                     android:textStyle="bold"
                     android:textColor="#1F1F1F"
                     android:textSize="14sp" />
