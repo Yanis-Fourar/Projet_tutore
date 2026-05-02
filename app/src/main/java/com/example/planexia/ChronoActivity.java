@@ -10,15 +10,9 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,9 +45,21 @@ public class ChronoActivity extends AppCompatActivity {
         @Override public void onServiceConnected(ComponentName name, IBinder binder) {
             chronoService = ((ChronoService.ChronoBinder) binder).getService();
             serviceBound  = true;
-            // Si le service était déjà en train de tourner (retour sur l'écran),
-            // on synchronise l'affichage avec l'état actuel
+
+            // BUG FIX 2 : récupérer le label de tâche depuis le service
+            // si on revient sur l'écran sans Intent (ex : navigation bas)
+            if (currentTaskTitle.isEmpty() && !chronoService.getTaskLabel().isEmpty()) {
+                currentTaskTitle = chronoService.getTaskLabel();
+                updateTaskCard();
+            }
+
             syncFromService();
+
+            // Afficher le dialog si on vient de la notification
+            if (pendingShowGoalDialog && chronoService.isGoalReached() && !dialogShowing) {
+                pendingShowGoalDialog = false;
+                onGoalReached();
+            }
         }
         @Override public void onServiceDisconnected(ComponentName name) {
             serviceBound = false;
@@ -61,7 +67,7 @@ public class ChronoActivity extends AppCompatActivity {
         }
     };
 
-    // ── BroadcastReceiver — tick toutes les secondes ───────────────
+    // ── BroadcastReceiver ──────────────────────────────────────────
     private final BroadcastReceiver tickReceiver = new BroadcastReceiver() {
         @Override public void onReceive(Context ctx, Intent intent) {
             if (ChronoService.ACTION_TICK.equals(intent.getAction())) {
@@ -69,17 +75,20 @@ public class ChronoActivity extends AppCompatActivity {
                 tvChronoTime.setText(formatTime(elapsed));
                 updateGoalDisplay(elapsed);
             } else if (ChronoService.ACTION_GOAL_REACHED.equals(intent.getAction())) {
-                onGoalReached();
+                // BUG FIX 1 : on reçoit le broadcast quand l'app est au premier plan
+                // → afficher le dialog SANS couper l'alarme (c'est le service qui sonne)
+                if (!dialogShowing) onGoalReached();
             }
         }
     };
 
     // ── Données courantes ──────────────────────────────────────────
-    private int    goalMinutes       = 0;
-    private long   goalMs            = 0L;
-    private String currentTaskTitle  = "";
-    private String currentModuleName = "";
-    private boolean dialogShowing    = false;
+    private int     goalMinutes          = 0;
+    private long    goalMs               = 0L;
+    private String  currentTaskTitle     = "";
+    private String  currentModuleName    = "";
+    private boolean dialogShowing        = false;
+    private boolean pendingShowGoalDialog = false;
 
     // ── Vues ───────────────────────────────────────────────────────
     private TextView     tvChronoTime;
@@ -114,23 +123,43 @@ public class ChronoActivity extends AppCompatActivity {
         setupBottomNav();
         setupClickListeners();
 
-        currentTaskTitle  = getOrEmpty(getIntent().getStringExtra("task_title"));
-        currentModuleName = getOrEmpty(getIntent().getStringExtra("task_module"));
+        // Lire les extras de l'Intent (null-safe)
+        // BUG FIX 2 : on ne lit le titre que si l'Intent en contient un
+        // (sinon on le récupérera depuis le service dans onServiceConnected)
+        String intentTaskTitle  = getIntent().getStringExtra("task_title");
+        String intentModuleName = getIntent().getStringExtra("task_module");
+        if (intentTaskTitle  != null) currentTaskTitle  = intentTaskTitle;
+        if (intentModuleName != null) currentModuleName = intentModuleName;
+
+        if (getIntent().getBooleanExtra(ChronoService.EXTRA_SHOW_GOAL_DIALOG, false)) {
+            pendingShowGoalDialog = true;
+        }
 
         repo.deleteOldChronoSessions(userId);
         loadHistoryFromDb();
         updateTaskCard();
 
-        // Démarrer et se lier au service
         Intent svcIntent = new Intent(this, ChronoService.class);
         startService(svcIntent);
         bindService(svcIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent.getBooleanExtra(ChronoService.EXTRA_SHOW_GOAL_DIALOG, false)) {
+            if (serviceBound && chronoService != null && chronoService.isGoalReached() && !dialogShowing) {
+                onGoalReached();
+            } else {
+                pendingShowGoalDialog = true;
+            }
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
-        // Enregistrer le receiver pour les ticks du service
         IntentFilter filter = new IntentFilter();
         filter.addAction(ChronoService.ACTION_TICK);
         filter.addAction(ChronoService.ACTION_GOAL_REACHED);
@@ -145,9 +174,14 @@ public class ChronoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadHistoryFromDb();
-        // Si on revient sur l'écran et le service tourne déjà → sync l'UI
-        if (serviceBound && chronoService != null) syncFromService();
-        // Si le service a atteint l'objectif pendant qu'on était ailleurs → afficher le dialog
+        if (serviceBound && chronoService != null) {
+            // BUG FIX 2 : au retour, récupérer le label depuis le service si besoin
+            if (currentTaskTitle.isEmpty() && !chronoService.getTaskLabel().isEmpty()) {
+                currentTaskTitle = chronoService.getTaskLabel();
+                updateTaskCard();
+            }
+            syncFromService();
+        }
         if (serviceBound && chronoService != null && chronoService.isGoalReached() && !dialogShowing) {
             onGoalReached();
         }
@@ -166,15 +200,15 @@ public class ChronoActivity extends AppCompatActivity {
             unbindService(serviceConnection);
             serviceBound = false;
         }
-        // Si le chrono n'est PAS en train de tourner (objectif atteint ou pas démarré)
-        // on stoppe proprement le service pour éviter qu'il reste en mémoire
-        if (chronoService != null && !chronoService.isRunning() && !chronoService.isGoalReached()) {
+        // Ne stopper le service QUE si aucun chrono n'a jamais été démarré
+        // (elapsed == 0 = pas encore lancé, pas en pause, pas en cours)
+        if (chronoService != null && chronoService.getElapsed() == 0 && !chronoService.isGoalReached()) {
             chronoService.stopTimer();
         }
         chronoService = null;
     }
 
-    // ── Synchroniser l'UI depuis l'état du service ─────────────────
+    // ── Synchroniser l'UI depuis le service ────────────────────────
     private void syncFromService() {
         if (chronoService == null) return;
         long elapsed = chronoService.getElapsed();
@@ -188,11 +222,10 @@ public class ChronoActivity extends AppCompatActivity {
             tvSessionStatus.setText("Session en cours");
             btnPause.setImageResource(android.R.drawable.ic_media_pause);
             if (cardCurrentTask != null) cardCurrentTask.setVisibility(View.VISIBLE);
-        } else if (elapsed > 0) {
+        } else if (elapsed > 0 && !chronoService.isGoalReached()) {
             tvSessionStatus.setText("En pause");
             btnPause.setImageResource(android.R.drawable.ic_media_play);
-        } else {
-            // Service démarré mais pas encore de timer → afficher le dialog
+        } else if (elapsed == 0 && !chronoService.isGoalReached()) {
             if (!dialogShowing) showGoalDialog();
         }
     }
@@ -217,7 +250,6 @@ public class ChronoActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-        // ⚠️ Le chrono CONTINUE quand on quitte — le service tourne en bg
 
         btnPause.setOnClickListener(v -> {
             if (chronoService == null) return;
@@ -237,7 +269,7 @@ public class ChronoActivity extends AppCompatActivity {
     }
 
     // ══════════════════════════════════════════════════════════════
-    //  Dialog objectif
+    //  Dialog objectif de départ
     // ══════════════════════════════════════════════════════════════
     private void showGoalDialog() {
         if (dialogShowing) return;
@@ -263,7 +295,6 @@ public class ChronoActivity extends AppCompatActivity {
         dialog.findViewById(R.id.btnGoalCancel).setOnClickListener(v -> {
             dialogShowing = false;
             dialog.dismiss();
-            // Si pas de timer actif → stopper le service et quitter
             if (chronoService != null && !chronoService.isRunning() && chronoService.getElapsed() == 0) {
                 chronoService.stopTimer();
             }
@@ -275,12 +306,11 @@ public class ChronoActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(raw)) { etMinutes.setError("Entrez un nombre de minutes"); return; }
             int min = Integer.parseInt(raw);
             if (min <= 0 || min > 999) { etMinutes.setError("Entre 1 et 999 minutes"); return; }
-            goalMinutes  = min;
-            goalMs       = (long) goalMinutes * 60 * 1000;
+            goalMinutes   = min;
+            goalMs        = (long) goalMinutes * 60 * 1000;
             dialogShowing = false;
             dialog.dismiss();
 
-            // Lancer le timer dans le service
             String label = currentTaskTitle.isEmpty() ? "Session d'étude" : currentTaskTitle;
             if (chronoService != null) chronoService.startTimer(goalMinutes, label);
 
@@ -294,40 +324,63 @@ public class ChronoActivity extends AppCompatActivity {
     }
 
     // ══════════════════════════════════════════════════════════════
-    //  Contrôles
+    //  Dialog "objectif atteint"
     // ══════════════════════════════════════════════════════════════
     private void onGoalReached() {
         dialogShowing = true;
         tvSessionStatus.setText("🎉 Objectif atteint !");
         btnPause.setImageResource(android.R.drawable.ic_media_play);
-        playAlarm();
 
-        // Sauvegarder en DB
-        String label = currentTaskTitle.isEmpty() ? "Session d'étude" : currentTaskTitle;
-        repo.addChronoSession(userId, label, goalMs, goalMinutes);
+        // BUG FIX 1 : NE PAS appeler stopAlarm() ici !
+        // L'alarme doit continuer de sonner jusqu'à ce que l'utilisateur appuie sur un bouton.
+        // stopAlarm() est appelé dans chaque bouton ci-dessous.
+
+        // Sauvegarder en DB (utiliser le label du service pour être sûr)
+        String label = !currentTaskTitle.isEmpty() ? currentTaskTitle
+                : (serviceBound && chronoService != null ? chronoService.getTaskLabel() : "Session d'étude");
+        if (label.isEmpty()) label = "Session d'étude";
+        final String savedLabel = label;
+
+        repo.addChronoSession(userId, savedLabel, goalMs, goalMinutes);
         loadHistoryFromDb();
 
         new AlertDialog.Builder(this)
                 .setTitle("🎉 Objectif atteint !")
                 .setMessage("Bravo ! " + goalMinutes + " min terminées.\n\nQue voulez-vous faire ?")
                 .setPositiveButton("Même objectif", (d, w) -> {
+                    stopAlarm(); // ← l'alarme s'arrête ICI, quand l'user appuie
                     dialogShowing = false;
                     tvChronoTime.setText("00:00");
                     tvSessionStatus.setText("Session en cours");
                     btnPause.setImageResource(android.R.drawable.ic_media_pause);
-                    String lbl = currentTaskTitle.isEmpty() ? "Session d'étude" : currentTaskTitle;
-                    if (chronoService != null) chronoService.startTimer(goalMinutes, lbl);
+                    if (chronoService != null) chronoService.startTimer(goalMinutes, savedLabel);
                 })
                 .setNegativeButton("Changer l'objectif", (d, w) -> {
+                    stopAlarm();
                     dialogShowing = false;
                     tvChronoTime.setText("00:00");
                     showGoalDialog();
                 })
-                .setNeutralButton("Quitter", (d, w) -> { dialogShowing = false; if (chronoService != null) chronoService.stopTimer(); finish(); })
+                .setNeutralButton("Quitter", (d, w) -> {
+                    stopAlarm();
+                    dialogShowing = false;
+                    if (chronoService != null) chronoService.stopTimer();
+                    finish();
+                })
                 .setCancelable(false)
                 .show();
     }
 
+    /** Arrête le son + vibration + notification via le service */
+    private void stopAlarm() {
+        if (serviceBound && chronoService != null) {
+            chronoService.stopAlarm();
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  Contrôles session
+    // ══════════════════════════════════════════════════════════════
     private void stopSession() {
         if (chronoService == null) return;
         long elapsed = chronoService.getElapsed();
@@ -343,7 +396,6 @@ public class ChronoActivity extends AppCompatActivity {
         tvSessionStatus.setText("Session terminée ✓");
         btnPause.setImageResource(android.R.drawable.ic_media_play);
 
-        // Redémarrer le service pour qu'il soit prêt pour la prochaine session
         Intent svcIntent = new Intent(this, ChronoService.class);
         startService(svcIntent);
         bindService(svcIntent, serviceConnection, Context.BIND_AUTO_CREATE);
@@ -365,7 +417,6 @@ public class ChronoActivity extends AppCompatActivity {
     private void resetChrono() {
         if (chronoService != null) {
             chronoService.pauseTimer();
-            // On stoppe le service et on en repart
             unbindService(serviceConnection);
             serviceBound = false;
             chronoService.stopTimer();
@@ -389,8 +440,8 @@ public class ChronoActivity extends AppCompatActivity {
 
         List<String[]> sessions = repo.getChronoSessionsLast24h(userId);
 
-        int  count    = sessions.size();
-        long totalMs  = 0;
+        int  count   = sessions.size();
+        long totalMs = 0;
         for (String[] s : sessions) totalMs += Long.parseLong(s[1]);
 
         if (tvSessionCount != null) tvSessionCount.setText(String.valueOf(count));
@@ -431,35 +482,8 @@ public class ChronoActivity extends AppCompatActivity {
     }
 
     // ══════════════════════════════════════════════════════════════
-    //  Son + vibration (quand l'écran est ouvert)
-    // ══════════════════════════════════════════════════════════════
-    private final Handler alarmHandler = new Handler(Looper.getMainLooper());
-    private void playAlarm() {
-        try {
-            Vibrator vib = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            if (vib != null && vib.hasVibrator()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    vib.vibrate(VibrationEffect.createWaveform(new long[]{0,300,200,300,200,600}, -1));
-                else
-                    vib.vibrate(new long[]{0,300,200,300,200,600}, -1);
-            }
-        } catch (Exception ignored) {}
-        try {
-            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
-            tg.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400);
-            alarmHandler.postDelayed(() -> tg.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 400), 600);
-            alarmHandler.postDelayed(() -> {
-                tg.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 800);
-                alarmHandler.postDelayed(tg::release, 1000);
-            }, 1200);
-        } catch (Exception ignored) {}
-    }
-
-    // ══════════════════════════════════════════════════════════════
     //  Utilitaires
     // ══════════════════════════════════════════════════════════════
-    private String getOrEmpty(String s) { return s != null ? s : ""; }
-
     private String formatTime(long ms) {
         long s = ms / 1000, h = s / 3600, m = (s % 3600) / 60, sec = s % 60;
         if (h > 0) return String.format(Locale.getDefault(), "%02d:%02d:%02d", h, m, sec);
@@ -479,7 +503,6 @@ public class ChronoActivity extends AppCompatActivity {
         BottomNavigationView nav = findViewById(R.id.bottomNavigationView);
         nav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            // ⚠️ On ne stoppe PAS le service — le chrono continue en bg
             if      (id == R.id.nav_matieres)   { startActivity(new Intent(this, ModulesActivity.class)); finish(); }
             else if (id == R.id.nav_taches)      { startActivity(new Intent(this, com.example.planexia.ui.tasks.TasksActivity.class)); finish(); }
             else if (id == R.id.nav_planning)    { startActivity(new Intent(this, PlanningActivity.class)); finish(); }
