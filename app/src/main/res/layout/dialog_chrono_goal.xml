@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mode Chrono"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1F1F1F"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Combien de minutes voulez-vous travailler ?"
+        android:textSize="13sp"
+        android:textColor="#8B5CF6"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Champ saisie minutes -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_edit_text"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginBottom="8dp">
+
+        <EditText
+            android:id="@+id/etGoalMinutes"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:hint="ex: 60"
+            android:inputType="number"
+            android:textSize="18sp"
+            android:textColor="#1F1F1F"
+            android:textStyle="bold"
+            android:background="@null"
+            android:maxLength="3"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="min"
+            android:textSize="16sp"
+            android:textColor="#888888"/>
+
+    </LinearLayout>
+
+    <!-- Raccourcis rapides -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <Button
+            android:id="@+id/btnQuick25"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="25 min"
+            android:textSize="12sp"
+            android:textColor="#8B5CF6"
+            android:textAllCaps="false"
+            android:background="@drawable/bg_button_outlined"/>
+
+        <Button
+            android:id="@+id/btnQuick45"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="45 min"
+            android:textSize="12sp"
+            android:textColor="#8B5CF6"
+            android:textAllCaps="false"
+            android:background="@drawable/bg_button_outlined"/>
+
+        <Button
+            android:id="@+id/btnQuick60"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="60 min"
+            android:textSize="12sp"
+            android:textColor="#8B5CF6"
+            android:textAllCaps="false"
+            android:background="@drawable/bg_button_outlined"/>
+
+        <Button
+            android:id="@+id/btnQuick90"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="90 min"
+            android:textSize="12sp"
+            android:textColor="#8B5CF6"
+            android:textAllCaps="false"
+            android:background="@drawable/bg_button_outlined"/>
+
+    </LinearLayout>
+
+    <!-- Boutons action -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnGoalCancel"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Annuler"
+            android:textAllCaps="false"
+            android:textColor="#8B5CF6"
+            android:textSize="15sp"
+            android:background="@drawable/bg_edit_text"/>
+
+        <Button
+            android:id="@+id/btnGoalStart"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Lancer ▶"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:background="@drawable/bg_save_button"/>
+
+    </LinearLayout>
+
+</LinearLayout>

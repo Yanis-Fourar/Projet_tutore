@@ -7,7 +7,6 @@
     android:orientation="vertical"
     android:background="#F4F1F8">
 
-    <!-- HEADER VIOLET -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,7 +39,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 3 CARTES STATS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -144,7 +142,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- PAR MATIÈRE titre -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -154,7 +151,6 @@
                 android:textColor="#1F1F1F"
                 android:layout_marginBottom="10dp"/>
 
-            <!-- Container dynamique modules -->
             <LinearLayout
                 android:id="@+id/containerModules"
                 android:layout_width="match_parent"
@@ -182,7 +178,8 @@
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Accède à des graphiques détaillés, courbes de progression, analyse de ton temps d'étude et bien plus" android:textColor="#D4C5F0" android:textSize="13sp" android:layout_marginBottom="10dp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Graphiques temps réel" android:textColor="#D4C5F0" android:textSize="12sp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Analyse hebdomadaire et mensuelle" android:textColor="#D4C5F0" android:textSize="12sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Répartition par matière" android:textColor="#D4C5F0" android:textSize="12sp" android:layout_marginBottom="14dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Répartition par matière" android:textColor="#D4C5F0" android:textSize="12sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="• Courbes de progression" android:textColor="#D4C5F0" android:textSize="12sp" android:layout_marginBottom="14dp"/>
                     <Button
                         android:id="@+id/btnPremiumStats"
                         android:layout_width="match_parent"

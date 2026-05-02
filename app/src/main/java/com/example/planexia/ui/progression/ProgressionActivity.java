@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
+import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.ui.modules.ModulesActivity;
@@ -36,35 +37,37 @@ public class ProgressionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progression);
 
-        prefs  = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", -1);
+        prefs  = getSharedPreferences("planexia_session", MODE_PRIVATE);
+        userId = new SessionManager(this).getUserId();
 
         repository = new PlanexiaRepository(this);
 
         loadData();
-        setupBottomNav();
         setupPremiumButtons();
+        setupBottomNav();
     }
 
     private void setupPremiumButtons() {
-        // Bouton Statistiques avancées :
-        // Si déjà premium → ouvre directement l'écran stats
-        // Sinon → affiche le dialog d'achat, puis ouvre l'écran stats après activation
-        findViewById(R.id.btnPremiumStats).setOnClickListener(v -> {
-            if (prefs.getBoolean("is_premium", false)) {
-                startActivity(new Intent(this, PremiumStatsActivity.class));
-            } else {
-                PremiumDialog.show(this, () -> {
-                    // Après activation : ouvrir les stats + cacher la bannière premium
+        View btnStats = findViewById(R.id.btnPremiumStats);
+        if (btnStats != null) {
+            btnStats.setOnClickListener(v -> {
+                boolean isPremium = prefs.getBoolean("is_premium", false)
+                        || repository.isPremium(userId);
+                if (isPremium) {
                     startActivity(new Intent(this, PremiumStatsActivity.class));
-                    loadData(); // recharge pour masquer la bannière si besoin
-                });
-            }
-        });
+                } else {
+                    PremiumDialog.show(this, () -> {
+                        startActivity(new Intent(this, PremiumStatsActivity.class));
+                        loadData();
+                    });
+                }
+            });
+        }
 
-        // Bouton Aide & Support : toujours accessible, pas de condition premium
-        findViewById(R.id.btnHelpSupport).setOnClickListener(v ->
-                startActivity(new Intent(this, HelpSupportActivity.class)));
+        View btnHelp = findViewById(R.id.btnHelpSupport);
+        if (btnHelp != null) {
+            btnHelp.setOnClickListener(v -> startActivity(new Intent(this, HelpSupportActivity.class)));
+        }
     }
 
     @Override
@@ -147,6 +150,10 @@ public class ProgressionActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.nav_planning) {
                 startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_profil) {
+                startActivity(new Intent(this, com.example.planexia.ProfileActivity.class));
                 finish();
                 return true;
             }

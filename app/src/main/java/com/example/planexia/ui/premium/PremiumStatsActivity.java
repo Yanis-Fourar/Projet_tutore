@@ -29,15 +29,16 @@ public class PremiumStatsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_premium_stats);
 
-        SharedPreferences prefs = getSharedPreferences("planexia_prefs", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
         userId = prefs.getLong("user_id", -1);
         boolean isPremium = prefs.getBoolean("is_premium", false);
 
         repository = new PlanexiaRepository(this);
 
+        if (!isPremium && userId != -1) isPremium = repository.isPremium(userId);
+
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
-        // Sécurité : si l'utilisateur n'est pas premium, afficher le dialog d'achat
         if (!isPremium) {
             PremiumDialog.show(this, () -> loadData());
             return;

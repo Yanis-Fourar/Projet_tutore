@@ -14,8 +14,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        android:background="#E0E0E0"
-        android:backgroundTint="#DDDDDD"/>
+        android:background="#DDDDDD"/>
 
     <!-- Titre de la tâche -->
     <TextView
@@ -48,7 +47,6 @@
         android:paddingHorizontal="24dp"
         android:background="?attr/selectableItemBackground">
 
-        <!-- Icône cercle violet -->
         <FrameLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -57,8 +55,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_edit_white"
-                android:contentDescription="Modifier"/>
+                android:src="@drawable/ic_edit_white"/>
         </FrameLayout>
 
         <LinearLayout
@@ -97,6 +94,76 @@
         android:layout_marginVertical="4dp"
         android:background="#F0F0F5"/>
 
+    <!-- Bouton Mode Chrono (Premium) -->
+    <LinearLayout
+        android:id="@+id/btnBottomSheetChrono"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:background="?attr/selectableItemBackground">
+
+        <FrameLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_purple">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="⏱"
+                android:textSize="18sp"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mode Chrono"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#6C3FC5"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" ✦ Premium"
+                    android:textSize="11sp"
+                    android:textColor="#FF9800"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chronométrer cette tâche"
+                android:textSize="12sp"
+                android:textColor="#888888"/>
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_arrow_right"
+            android:alpha="0.3"/>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginVertical="4dp"
+        android:background="#F0F0F5"/>
+
     <!-- Bouton Supprimer -->
     <LinearLayout
         android:id="@+id/btnBottomSheetDelete"
@@ -107,7 +174,6 @@
         android:paddingHorizontal="24dp"
         android:background="?attr/selectableItemBackground">
 
-        <!-- Icône cercle rouge -->
         <FrameLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -116,8 +182,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_delete_white"
-                android:contentDescription="Supprimer"/>
+                android:src="@drawable/ic_delete_white"/>
         </FrameLayout>
 
         <LinearLayout

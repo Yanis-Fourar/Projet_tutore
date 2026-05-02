@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,7 +54,14 @@ public class PlanningActivity extends AppCompatActivity {
         setupToggle();
         setupRecyclerView();
         setupBottomNav();
+        hidePremiumBanners();
         loadJourMode();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hidePremiumBanners();
     }
 
     private void initViews() {
@@ -63,16 +71,10 @@ public class PlanningActivity extends AppCompatActivity {
         bottomNav        = findViewById(R.id.bottomNavigationView);
 
         Button btnPremium = findViewById(R.id.btnDebloquerPremium);
-        Button btnIA      = findViewById(R.id.btnDecouvrirIA);
+        btnPremium.setOnClickListener(v -> PremiumDialog.show(this, () -> hidePremiumBanners()));
 
-        // ← MODIFIÉ : brancher le popup Premium
-        btnPremium.setOnClickListener(v ->
-                PremiumDialog.show(this, () -> {
-                    // callback : rien de spécial pour le planning
-                })
-        );
-
-        btnIA.setOnClickListener(v -> onIAClicked());
+        Button btnIA = findViewById(R.id.btnIA);
+        if (btnIA != null) btnIA.setOnClickListener(v -> onIAClicked());
     }
 
     private void setupToggle() {
@@ -210,6 +212,17 @@ public class PlanningActivity extends AppCompatActivity {
             btnSemaine.setTextColor(getColor(R.color.purple_primary));
             btnJour.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             btnJour.setTextColor(android.graphics.Color.parseColor("#888888"));
+        }
+    }
+
+    private void hidePremiumBanners() {
+        PlanexiaRepository repo = new PlanexiaRepository(this);
+        boolean isPremium = getSharedPreferences("planexia_session", MODE_PRIVATE)
+                .getBoolean("is_premium", false)
+                || repo.isPremium(session.getUserId());
+        if (isPremium) {
+            CardView cardChrono = findViewById(R.id.cardBannerChrono);
+            if (cardChrono != null) cardChrono.setVisibility(android.view.View.GONE);
         }
     }
 

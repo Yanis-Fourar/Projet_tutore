@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
         tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:allowBackup="true"
@@ -32,23 +35,27 @@
         <activity android:name=".LoginActivity"    android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".RegisterActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
 
-        <!-- Modules / Objectifs / Tâches / Progression -->
-        <activity android:name=".ui.modules.ModulesActivity"         android:exported="false" />
-        <activity android:name=".ui.modules.AddModuleActivity"       android:exported="false" />
-        <activity android:name=".ui.objectives.ObjectivesActivity"   android:exported="false" />
-        <activity android:name=".ui.objectives.AddObjectiveActivity" android:exported="false" />
-        <activity android:name=".ui.tasks.TasksActivity"             android:exported="false" />
-        <activity android:name=".ui.tasks.ObjectiveDetailActivity"   android:exported="false" />
-        <activity android:name=".ui.progression.ProgressionActivity" android:exported="false" />
-        <activity android:name=".PlanningActivity"                   android:exported="false" />
-        <activity android:name=".notifications.NotificationsActivity" android:exported="false" />
+        <!-- App principale -->
+        <activity android:name=".PlanningActivity"                    android:exported="false" />
+        <activity android:name=".ui.modules.ModulesActivity"          android:exported="false" />
+        <activity android:name=".ui.modules.AddModuleActivity"        android:exported="false" />
+        <activity android:name=".ui.objectives.ObjectivesActivity"    android:exported="false" />
+        <activity android:name=".ui.objectives.AddObjectiveActivity"  android:exported="false" />
+        <activity android:name=".ui.tasks.TasksActivity"              android:exported="false" />
+        <activity android:name=".ui.tasks.ObjectiveDetailActivity"    android:exported="false" />
+        <activity android:name=".ui.progression.ProgressionActivity"  android:exported="false" />
 
         <!-- Premium -->
         <activity android:name=".ui.premium.PremiumStatsActivity" android:exported="false" />
         <activity android:name=".ui.premium.HelpSupportActivity"  android:exported="false" />
         <activity android:name=".ProfileActivity"                  android:exported="false" />
 
-        <!-- Receiver pour les notifications -->
+        <!-- Chrono -->
+        <activity android:name=".ChronoActivity" android:exported="false" android:launchMode="singleTop"/>
+        <service  android:name=".ChronoService"  android:exported="false" android:foregroundServiceType="mediaPlayback"/>
+
+        <!-- Notifications -->
+        <activity android:name=".notifications.NotificationsActivity" android:exported="false"/>
         <receiver android:name=".notifications.TaskReminderReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>

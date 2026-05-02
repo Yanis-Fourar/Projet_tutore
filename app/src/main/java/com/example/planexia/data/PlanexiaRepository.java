@@ -94,34 +94,6 @@ public class PlanexiaRepository {
         return info;
     }
 
-    // ← AJOUT : Premium
-    public void setPremium(long userId, boolean isPremium) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(PlanexiaDatabaseHelper.C_IS_PREMIUM, isPremium ? 1 : 0);
-        db.update(
-                PlanexiaDatabaseHelper.T_USERS,
-                values,
-                PlanexiaDatabaseHelper.C_ID + " = ?",
-                new String[]{String.valueOf(userId)}
-        );
-    }
-
-    public boolean isPremium(long userId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(
-                PlanexiaDatabaseHelper.T_USERS,
-                new String[]{PlanexiaDatabaseHelper.C_IS_PREMIUM},
-                PlanexiaDatabaseHelper.C_ID + " = ?",
-                new String[]{String.valueOf(userId)},
-                null, null, null
-        );
-        boolean premium = false;
-        if (c.moveToFirst()) premium = c.getInt(0) == 1;
-        c.close();
-        return premium;
-    }
-
     // ---------- MODULES ----------
     public long addModule(long userId, String name, int coefficient, String color) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -544,7 +516,6 @@ public class PlanexiaRepository {
         return count;
     }
 
-    /** Retourne int[7] : nb de tâches ayant une due_date par jour [Lun, Mar, Mer, Jeu, Ven, Sam, Dim] */
     public int[] getTasksDueByDayOfWeek(long userId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         int[] counts = new int[7];
@@ -557,19 +528,15 @@ public class PlanexiaRepository {
                 " GROUP BY strftime('%w', t." + PlanexiaDatabaseHelper.C_DUE_DATE + ");";
         Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
         while (c.moveToNext()) {
-            int dow = c.getInt(0); // 0=Dim, 1=Lun, ..., 6=Sam
+            int dow = c.getInt(0);
             int count = c.getInt(1);
-            int idx = (dow == 0) ? 6 : dow - 1; // Lun=0, ..., Dim=6
+            int idx = (dow == 0) ? 6 : dow - 1;
             counts[idx] = count;
         }
         c.close();
         return counts;
     }
 
-    /**
-     * Retourne pour chaque module : [total tasks, done tasks]
-     * Utilisé par la page Progression pour afficher la barre par matière.
-     */
     public int[] getProgressForModule(long moduleId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -595,5 +562,69 @@ public class PlanexiaRepository {
         doneC.close();
 
         return new int[]{total, done};
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  CHRONO SESSIONS
+    // ══════════════════════════════════════════════════════════════
+
+    /** Sauvegarder une session chrono */
+    public long addChronoSession(long userId, String taskLabel, long durationMs, int goalMin) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put(PlanexiaDatabaseHelper.C_USER_ID,    userId);
+        v.put(PlanexiaDatabaseHelper.C_TASK_LABEL, taskLabel);
+        v.put(PlanexiaDatabaseHelper.C_DURATION_MS, durationMs);
+        v.put(PlanexiaDatabaseHelper.C_GOAL_MIN,   goalMin);
+        v.put(PlanexiaDatabaseHelper.C_CREATED_AT, System.currentTimeMillis());
+        return db.insert(PlanexiaDatabaseHelper.T_CHRONO_SESSIONS, null, v);
+    }
+
+    /**
+     * Récupérer les sessions des dernières 24h pour un utilisateur.
+     * Retourne une liste de tableaux : [taskLabel, durationMs, goalMin, createdAt]
+     */
+    public java.util.List<String[]> getChronoSessionsLast24h(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        long since = System.currentTimeMillis() - 24L * 60 * 60 * 1000;
+
+        Cursor c = db.query(
+                PlanexiaDatabaseHelper.T_CHRONO_SESSIONS,
+                new String[]{
+                        PlanexiaDatabaseHelper.C_TASK_LABEL,
+                        PlanexiaDatabaseHelper.C_DURATION_MS,
+                        PlanexiaDatabaseHelper.C_GOAL_MIN,
+                        PlanexiaDatabaseHelper.C_CREATED_AT
+                },
+                PlanexiaDatabaseHelper.C_USER_ID + " = ? AND " +
+                        PlanexiaDatabaseHelper.C_CREATED_AT + " >= ?",
+                new String[]{String.valueOf(userId), String.valueOf(since)},
+                null, null,
+                PlanexiaDatabaseHelper.C_CREATED_AT + " DESC"
+        );
+
+        java.util.List<String[]> result = new java.util.ArrayList<>();
+        while (c.moveToNext()) {
+            result.add(new String[]{
+                    c.getString(0),               // taskLabel
+                    String.valueOf(c.getLong(1)), // durationMs
+                    String.valueOf(c.getInt(2)),  // goalMin
+                    String.valueOf(c.getLong(3))  // createdAt
+            });
+        }
+        c.close();
+        return result;
+    }
+
+    /** Supprimer les sessions de plus de 24h */
+    public void deleteOldChronoSessions(long userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long limit = System.currentTimeMillis() - 24L * 60 * 60 * 1000;
+        db.delete(
+                PlanexiaDatabaseHelper.T_CHRONO_SESSIONS,
+                PlanexiaDatabaseHelper.C_USER_ID + " = ? AND " +
+                        PlanexiaDatabaseHelper.C_CREATED_AT + " < ?",
+                new String[]{String.valueOf(userId), String.valueOf(limit)}
+        );
     }
 }
