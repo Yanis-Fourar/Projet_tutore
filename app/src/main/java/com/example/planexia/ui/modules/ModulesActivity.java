@@ -3,18 +3,22 @@ package com.example.planexia.ui.modules;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.model.Module;
+import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.ui.adapters.ModuleAdapter;
 import com.example.planexia.ui.objectives.ObjectivesActivity;
 import com.example.planexia.ui.progression.ProgressionActivity;
@@ -33,6 +37,7 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
     private List<Module> moduleList;
     private ImageButton btnAddModule;
     private android.widget.TextView tvModulesCount;
+    private CardView cardPremium;
     private PlanexiaRepository repository;
     private long userId;
 
@@ -77,11 +82,12 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
 
         repository = new PlanexiaRepository(this);
         SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
-        userId = prefs.getLong("user_id", 1); // 1 = temporaire jusqu'au login
+        userId = prefs.getLong("user_id", 1);
 
         rvModules      = findViewById(R.id.rvModules);
         btnAddModule   = findViewById(R.id.btnAddModule);
         tvModulesCount = findViewById(R.id.tvModulesCount);
+        cardPremium    = findViewById(R.id.cardPremium);
 
         moduleList    = new ArrayList<>();
         moduleAdapter = new ModuleAdapter(moduleList, this);
@@ -90,11 +96,32 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
 
         reloadModules();
 
+        // Bouton Passer Premium
+        Button btnPremium = findViewById(R.id.btnPremium);
+        if (btnPremium != null) {
+            btnPremium.setOnClickListener(v ->
+                    PremiumDialog.show(this, () -> {
+                        reloadModules();
+                        updatePremiumCard();
+                    })
+            );
+        }
+
+        // Bouton ajouter module
         btnAddModule.setOnClickListener(v -> {
+            boolean isPremium = repository.isPremium(userId);
+            if (!isPremium && moduleList.size() >= FREE_MODULE_LIMIT) {
+                PremiumDialog.show(this, () -> {
+                    reloadModules();
+                    updatePremiumCard();
+                });
+                return;
+            }
             Intent intent = new Intent(ModulesActivity.this, AddModuleActivity.class);
             addOrEditModuleLauncher.launch(intent);
         });
 
+        // Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_matieres);
@@ -113,7 +140,8 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
                     finish();
                     return true;
                 } else if (id == R.id.nav_profil) {
-                    Toast.makeText(this, "Profil bientôt disponible", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, com.example.planexia.ProfileActivity.class));
+                    finish();
                     return true;
                 }
                 return false;
@@ -125,6 +153,7 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
     protected void onResume() {
         super.onResume();
         reloadModules();
+        updatePremiumCard();
     }
 
     private void reloadModules() {
@@ -137,6 +166,13 @@ public class ModulesActivity extends AppCompatActivity implements ModuleAdapter.
     private void updateModulesCount() {
         if (tvModulesCount != null) {
             tvModulesCount.setText(moduleList.size() + "/" + FREE_MODULE_LIMIT + " matières utilisées");
+        }
+    }
+
+    private void updatePremiumCard() {
+        boolean isPremium = repository.isPremium(userId);
+        if (cardPremium != null) {
+            cardPremium.setVisibility(isPremium ? View.GONE : View.VISIBLE);
         }
     }
 
