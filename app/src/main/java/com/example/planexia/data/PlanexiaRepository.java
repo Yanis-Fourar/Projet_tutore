@@ -485,4 +485,20 @@ public class PlanexiaRepository {
 
         return new int[]{total, done};
     }
+
+    /**
+     * Supprime un utilisateur ET en cascade ses modules / objectifs / tâches
+     * @return true si la suppression a réussi, false sinon
+     */
+    public boolean deleteUser(long userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        // Active les FK pour cette session (au cas où onConfigure n'a pas été appelé)
+        db.execSQL("PRAGMA foreign_keys=ON;");
+        int rowsDeleted = db.delete(
+                PlanexiaDatabaseHelper.T_USERS,
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(userId)}
+        );
+        return rowsDeleted > 0;
+    }
 }

@@ -8,6 +8,7 @@
         tools:ignore="ProtectedPermissions"/>
 
     <application
+        android:name=".PlanexiaApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -32,6 +33,10 @@
         <activity android:name=".LoginActivity"    android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".RegisterActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
 
+        <!-- Profil + Paramètres -->
+        <activity android:name=".ProfileActivity"    android:exported="false" />
+        <activity android:name=".ParametresActivity" android:exported="false" />
+
         <!-- Modules / Objectifs / Tâches / Progression -->
         <activity android:name=".ui.modules.ModulesActivity"         android:exported="false" />
         <activity android:name=".ui.modules.AddModuleActivity"       android:exported="false" />
@@ -53,6 +58,5 @@
         </receiver>
 
     </application>
-
 
 </manifest>
