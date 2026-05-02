@@ -39,7 +39,6 @@ public class ProgressionActivity extends AppCompatActivity {
 
         prefs  = getSharedPreferences("planexia_session", MODE_PRIVATE);
         userId = new SessionManager(this).getUserId();
-
         repository = new PlanexiaRepository(this);
 
         loadData();
@@ -74,6 +73,14 @@ public class ProgressionActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadData();
+        Button btnPremiumStats = findViewById(R.id.btnPremiumStats);
+        if (btnPremiumStats != null) updateStatsButtonText(btnPremiumStats);
+    }
+
+    private void updateStatsButtonText(android.widget.Button btn) {
+        boolean isPremium = prefs.getBoolean("is_premium", false)
+                || repository.isPremium(userId);
+        btn.setText(isPremium ? "Voir les statistiques avancées" : "Débloquer les statistiques ✦");
     }
 
     private void loadData() {
@@ -90,8 +97,11 @@ public class ProgressionActivity extends AppCompatActivity {
 
         if (tvProgress  != null) tvProgress.setText(globalProgress + "%");
         if (tvDoneTasks != null) tvDoneTasks.setText(String.valueOf(doneTasks));
-        if (tvTotal     != null) tvTotal.setText(totalTasks + " tâches");
+        if (tvTotal     != null) tvTotal.setText(String.valueOf(totalTasks));
         if (pbGlobal    != null) pbGlobal.setProgress(globalProgress);
+
+        TextView tvPercentBar = findViewById(R.id.tvGlobalPercentBar);
+        if (tvPercentBar != null) tvPercentBar.setText(globalProgress + "%");
 
         LinearLayout containerModules = findViewById(R.id.containerModules);
         if (containerModules == null) return;
@@ -141,17 +151,11 @@ public class ProgressionActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.nav_progression) return true;
             else if (id == R.id.nav_matieres) {
-                startActivity(new Intent(this, ModulesActivity.class));
-                finish();
-                return true;
+                startActivity(new Intent(this, ModulesActivity.class)); finish(); return true;
             } else if (id == R.id.nav_taches) {
-                startActivity(new Intent(this, TasksActivity.class));
-                finish();
-                return true;
+                startActivity(new Intent(this, TasksActivity.class)); finish(); return true;
             } else if (id == R.id.nav_planning) {
-                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
-                finish();
-                return true;
+                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class)); finish(); return true;
             } else if (id == R.id.nav_profil) {
                 startActivity(new Intent(this, com.example.planexia.ProfileActivity.class));
                 finish();

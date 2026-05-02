@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:background="#F4F1F8">
 
+    <!-- HEADER VIOLET -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,6 +40,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- 3 CARTES STATS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -142,6 +144,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- PAR MATIÈRE -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -158,8 +161,9 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- BANNIÈRE PREMIUM -->
+            <!-- BANNIÈRE PREMIUM — android:id ajouté pour masquer si premium -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardBannerStats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"

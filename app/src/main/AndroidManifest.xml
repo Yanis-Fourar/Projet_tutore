@@ -61,7 +61,7 @@
         <activity android:name=".ChronoActivity" android:exported="false" android:launchMode="singleTop"/>
         <service  android:name=".ChronoService"  android:exported="false" android:foregroundServiceType="mediaPlayback"/>
 
-        <!-- Notifications -->
+        <!-- ===== NOTIFICATIONS ===== -->
         <activity android:name=".notifications.NotificationsActivity" android:exported="false"/>
         <receiver android:name=".notifications.TaskReminderReceiver" android:exported="true">
             <intent-filter>
