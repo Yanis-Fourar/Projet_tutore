@@ -89,6 +89,8 @@ public class ChronoActivity extends AppCompatActivity {
     private String  currentModuleName    = "";
     private boolean dialogShowing        = false;
     private boolean pendingShowGoalDialog = false;
+    /** true quand l'utilisateur quitte volontairement (retour, annuler) — false si navigation barre du bas */
+    private boolean intentionalExit      = false;
 
     // ── Vues ───────────────────────────────────────────────────────
     private TextView     tvChronoTime;
@@ -200,10 +202,12 @@ public class ChronoActivity extends AppCompatActivity {
             unbindService(serviceConnection);
             serviceBound = false;
         }
-        // Ne stopper le service QUE si aucun chrono n'a jamais été démarré
-        // (elapsed == 0 = pas encore lancé, pas en pause, pas en cours)
-        if (chronoService != null && chronoService.getElapsed() == 0 && !chronoService.isGoalReached()) {
-            chronoService.stopTimer();
+        // Stopper le service seulement si l'utilisateur a quitté volontairement
+        // (bouton retour ou annuler) — pas si navigation barre du bas avec chrono actif
+        if (chronoService != null && (intentionalExit || !chronoService.isGoalReached())) {
+            if (intentionalExit || chronoService.getElapsed() == 0) {
+                chronoService.stopTimer();
+            }
         }
         chronoService = null;
     }
@@ -249,7 +253,11 @@ public class ChronoActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        findViewById(R.id.btnBack).setOnClickListener(v -> {
+            intentionalExit = true;
+            if (chronoService != null) chronoService.stopTimer();
+            finish();
+        });
 
         btnPause.setOnClickListener(v -> {
             if (chronoService == null) return;
@@ -295,6 +303,7 @@ public class ChronoActivity extends AppCompatActivity {
         dialog.findViewById(R.id.btnGoalCancel).setOnClickListener(v -> {
             dialogShowing = false;
             dialog.dismiss();
+            intentionalExit = true;
             if (chronoService != null && !chronoService.isRunning() && chronoService.getElapsed() == 0) {
                 chronoService.stopTimer();
             }
