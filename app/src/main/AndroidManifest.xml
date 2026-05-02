@@ -45,7 +45,8 @@
         <activity android:name=".ui.tasks.TasksActivity" />
         <activity android:name=".ui.tasks.ObjectiveDetailActivity" />
         <activity android:name=".ui.progression.ProgressionActivity" />
-        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity"    android:exported="false" />
+        <activity android:name=".ParametresActivity" android:exported="false" />
 
         <!-- ===== PREMIUM ===== -->
         <activity android:name=".ui.premium.PremiumStatsActivity" android:exported="false" />

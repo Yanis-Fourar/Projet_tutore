@@ -630,4 +630,14 @@ public class PlanexiaRepository {
                 new String[]{String.valueOf(userId), String.valueOf(limit)}
         );
     }
+    public boolean deleteUser(long userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("PRAGMA foreign_keys=ON;");
+        int rows = db.delete(
+                PlanexiaDatabaseHelper.T_USERS,
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(userId)}
+        );
+        return rows > 0;
+    }
 }

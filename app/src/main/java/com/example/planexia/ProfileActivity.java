@@ -103,7 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (rowSuspend != null)
             rowSuspend.setOnClickListener(v -> confirmerSuspension());
         if (rowParametres != null)
-            rowParametres.setOnClickListener(v -> Toast.makeText(this, "Paramètres à venir", Toast.LENGTH_SHORT).show());
+            rowParametres.setOnClickListener(v -> startActivity(new Intent(this, ParametresActivity.class)));
         if (rowNotifications != null)
             rowNotifications.setOnClickListener(v -> startActivity(new Intent(this, com.example.planexia.notifications.NotificationsActivity.class)));
         if (rowAide != null)
@@ -115,7 +115,6 @@ public class ProfileActivity extends AppCompatActivity {
     private void confirmerSuspension() {
         long userId = sessionManager.getUserId();
         List<Module> modules = repo.getModulesByUser(userId);
-
         if (modules.size() <= 3) {
             suspendPremiumSimple(userId);
         } else {
@@ -145,34 +144,24 @@ public class ProfileActivity extends AppCompatActivity {
             noms[i] = modules.get(i).getName();
             checked[i] = false;
         }
-
         final List<Integer> selectedIndices = new ArrayList<>();
-
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Choisissez 3 modules à garder")
                 .setMultiChoiceItems(noms, checked, (d, which, isChecked) -> {
-                    if (isChecked) {
-                        selectedIndices.add(which);
-                    } else {
-                        selectedIndices.remove(Integer.valueOf(which));
-                    }
+                    if (isChecked) selectedIndices.add(which);
+                    else selectedIndices.remove(Integer.valueOf(which));
                 })
                 .setPositiveButton("Confirmer", null)
                 .setNegativeButton("Annuler", null)
                 .create();
-
         dialog.setOnShowListener(d -> {
-            Button btnConfirmer = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            btnConfirmer.setOnClickListener(v -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 if (selectedIndices.size() != 3) {
                     Toast.makeText(this, "Sélectionnez exactement 3 modules", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                for (int i = 0; i < modules.size(); i++) {
-                    if (!selectedIndices.contains(i)) {
-                        repo.deleteModule(modules.get(i).getId());
-                    }
-                }
+                for (int i = 0; i < modules.size(); i++)
+                    if (!selectedIndices.contains(i)) repo.deleteModule(modules.get(i).getId());
                 repo.setPremium(userId, false);
                 getSharedPreferences("planexia_session", MODE_PRIVATE)
                         .edit().putBoolean("is_premium", false).apply();
@@ -181,7 +170,6 @@ public class ProfileActivity extends AppCompatActivity {
                 setupUserInfo();
             });
         });
-
         dialog.show();
     }
 
