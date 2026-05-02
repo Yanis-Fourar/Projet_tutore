@@ -6,12 +6,12 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.planexia.R;
 import com.example.planexia.data.SessionManager;
 
 /**
  * Premier écran : choix entre se connecter et créer un compte.
- * Si l'utilisateur est déjà connecté, on saute cet écran et on va au Dashboard.
+ * Si l'utilisateur est déjà connecté, on saute cet écran et on va à
+ * PlanningActivity (le vrai dashboard de l'app).
  */
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -19,10 +19,14 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Si déjà connecté → DashboardActivity directement
+        // Si déjà connecté → PlanningActivity directement
         SessionManager session = new SessionManager(this);
         if (session.isLoggedIn()) {
-            goToDashboard();
+            Intent intent = new Intent(this, PlanningActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
             return;
         }
 
@@ -36,19 +40,5 @@ public class WelcomeActivity extends AppCompatActivity {
 
         btnGoRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
-    }
-
-    private void goToDashboard() {
-        // ⚠️ DashboardActivity sera créée par un autre membre.
-        // Tant qu'elle n'existe pas, on reste sur Welcome (le try/catch évite le crash).
-        try {
-            Class<?> dashboardClass = Class.forName("com.example.planexia.ui.DashboardActivity");
-            Intent intent = new Intent(this, dashboardClass);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 }

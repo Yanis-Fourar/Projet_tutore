@@ -33,33 +33,6 @@ public class PlanexiaRepository {
         return db.insert(PlanexiaDatabaseHelper.T_USERS, null, values);
     }
 
-    public boolean isPremium(long userId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(
-                PlanexiaDatabaseHelper.T_USERS,
-                new String[]{PlanexiaDatabaseHelper.C_IS_PREMIUM},
-                PlanexiaDatabaseHelper.C_ID + " = ?",
-                new String[]{String.valueOf(userId)},
-                null, null, null
-        );
-        boolean premium = false;
-        if (c.moveToFirst()) premium = c.getInt(0) == 1;
-        c.close();
-        return premium;
-    }
-
-    public void setPremium(long userId, boolean premium) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(PlanexiaDatabaseHelper.C_IS_PREMIUM, premium ? 1 : 0);
-        db.update(
-                PlanexiaDatabaseHelper.T_USERS,
-                values,
-                PlanexiaDatabaseHelper.C_ID + " = ?",
-                new String[]{String.valueOf(userId)}
-        );
-    }
-
     public long login(String email, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
@@ -86,9 +59,9 @@ public class PlanexiaRepository {
         );
         String[] info = {"?", "?", "?"};
         if (c.moveToFirst()) {
-            info[0] = c.getString(0);
-            info[1] = c.getString(1);
-            info[2] = c.getString(2);
+            info[0] = c.getString(0); // pseudo
+            info[1] = c.getString(1); // filiere
+            info[2] = c.getString(2); // annee
         }
         c.close();
         return info;
@@ -276,6 +249,7 @@ public class PlanexiaRepository {
         );
     }
 
+    /** Retourne la due_date de l'objectif parent d'une tâche, ou null si introuvable. */
     public String getObjectiveDueDateForTask(long taskId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sql = "SELECT o." + PlanexiaDatabaseHelper.C_DUE_DATE +
@@ -438,6 +412,7 @@ public class PlanexiaRepository {
         return (int) Math.round((done * 100.0) / total);
     }
 
+    /** Progression globale de l'utilisateur en % */
     public int getGlobalProgress(long userId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         int[] counts = getTotalAndDone(db, userId);
@@ -445,11 +420,13 @@ public class PlanexiaRepository {
         return (int) Math.round((counts[1] * 100.0) / counts[0]);
     }
 
+    /** Nombre total de tâches complétées pour l'utilisateur */
     public int getCompletedTasksCount(long userId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         return getTotalAndDone(db, userId)[1];
     }
 
+    /** Nombre total de tâches de l'utilisateur */
     public int getTotalTasksCount(long userId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         return getTotalAndDone(db, userId)[0];
@@ -478,65 +455,10 @@ public class PlanexiaRepository {
         return new int[]{total, done};
     }
 
-    public int getPendingTasksCount(long userId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String sql = "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
-                " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
-                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
-                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ? AND t." + PlanexiaDatabaseHelper.C_IS_DONE + " = 0;";
-        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
-        int count = 0;
-        if (c.moveToFirst()) count = c.getInt(0);
-        c.close();
-        return count;
-    }
-
-    public int getTotalObjectivesCount(long userId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String sql = "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o" +
-                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
-                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?;";
-        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
-        int count = 0;
-        if (c.moveToFirst()) count = c.getInt(0);
-        c.close();
-        return count;
-    }
-
-    public int getObjectivesCountForModule(long moduleId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_OBJECTIVES +
-                        " WHERE " + PlanexiaDatabaseHelper.C_MODULE_ID + " = ?;",
-                new String[]{String.valueOf(moduleId)}
-        );
-        int count = 0;
-        if (c.moveToFirst()) count = c.getInt(0);
-        c.close();
-        return count;
-    }
-
-    public int[] getTasksDueByDayOfWeek(long userId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        int[] counts = new int[7];
-        String sql = "SELECT strftime('%w', t." + PlanexiaDatabaseHelper.C_DUE_DATE + "), COUNT(*)" +
-                " FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
-                " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
-                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
-                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?" +
-                " AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " IS NOT NULL AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " != ''" +
-                " GROUP BY strftime('%w', t." + PlanexiaDatabaseHelper.C_DUE_DATE + ");";
-        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
-        while (c.moveToNext()) {
-            int dow = c.getInt(0);
-            int count = c.getInt(1);
-            int idx = (dow == 0) ? 6 : dow - 1;
-            counts[idx] = count;
-        }
-        c.close();
-        return counts;
-    }
-
+    /**
+     * Retourne pour chaque module : [total tasks, done tasks]
+     * Utilisé par la page Progression pour afficher la barre par matière.
+     */
     public int[] getProgressForModule(long moduleId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -564,67 +486,19 @@ public class PlanexiaRepository {
         return new int[]{total, done};
     }
 
-    // ══════════════════════════════════════════════════════════════
-    //  CHRONO SESSIONS
-    // ══════════════════════════════════════════════════════════════
-
-    /** Sauvegarder une session chrono */
-    public long addChronoSession(long userId, String taskLabel, long durationMs, int goalMin) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues v = new ContentValues();
-        v.put(PlanexiaDatabaseHelper.C_USER_ID,    userId);
-        v.put(PlanexiaDatabaseHelper.C_TASK_LABEL, taskLabel);
-        v.put(PlanexiaDatabaseHelper.C_DURATION_MS, durationMs);
-        v.put(PlanexiaDatabaseHelper.C_GOAL_MIN,   goalMin);
-        v.put(PlanexiaDatabaseHelper.C_CREATED_AT, System.currentTimeMillis());
-        return db.insert(PlanexiaDatabaseHelper.T_CHRONO_SESSIONS, null, v);
-    }
-
     /**
-     * Récupérer les sessions des dernières 24h pour un utilisateur.
-     * Retourne une liste de tableaux : [taskLabel, durationMs, goalMin, createdAt]
+     * Supprime un utilisateur ET en cascade ses modules / objectifs / tâches
+     * @return true si la suppression a réussi, false sinon
      */
-    public java.util.List<String[]> getChronoSessionsLast24h(long userId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        long since = System.currentTimeMillis() - 24L * 60 * 60 * 1000;
-
-        Cursor c = db.query(
-                PlanexiaDatabaseHelper.T_CHRONO_SESSIONS,
-                new String[]{
-                        PlanexiaDatabaseHelper.C_TASK_LABEL,
-                        PlanexiaDatabaseHelper.C_DURATION_MS,
-                        PlanexiaDatabaseHelper.C_GOAL_MIN,
-                        PlanexiaDatabaseHelper.C_CREATED_AT
-                },
-                PlanexiaDatabaseHelper.C_USER_ID + " = ? AND " +
-                        PlanexiaDatabaseHelper.C_CREATED_AT + " >= ?",
-                new String[]{String.valueOf(userId), String.valueOf(since)},
-                null, null,
-                PlanexiaDatabaseHelper.C_CREATED_AT + " DESC"
-        );
-
-        java.util.List<String[]> result = new java.util.ArrayList<>();
-        while (c.moveToNext()) {
-            result.add(new String[]{
-                    c.getString(0),               // taskLabel
-                    String.valueOf(c.getLong(1)), // durationMs
-                    String.valueOf(c.getInt(2)),  // goalMin
-                    String.valueOf(c.getLong(3))  // createdAt
-            });
-        }
-        c.close();
-        return result;
-    }
-
-    /** Supprimer les sessions de plus de 24h */
-    public void deleteOldChronoSessions(long userId) {
+    public boolean deleteUser(long userId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        long limit = System.currentTimeMillis() - 24L * 60 * 60 * 1000;
-        db.delete(
-                PlanexiaDatabaseHelper.T_CHRONO_SESSIONS,
-                PlanexiaDatabaseHelper.C_USER_ID + " = ? AND " +
-                        PlanexiaDatabaseHelper.C_CREATED_AT + " < ?",
-                new String[]{String.valueOf(userId), String.valueOf(limit)}
+        // Active les FK pour cette session (au cas où onConfigure n'a pas été appelé)
+        db.execSQL("PRAGMA foreign_keys=ON;");
+        int rowsDeleted = db.delete(
+                PlanexiaDatabaseHelper.T_USERS,
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(userId)}
         );
+        return rowsDeleted > 0;
     }
 }

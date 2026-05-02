@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Couleurs principales (gardent leur identité) -->
+    <color name="purple_primary">#7C3AED</color>
+    <color name="purple_dark">#5B21B6</color>
+    <color name="purple_light">#A78BFA</color>
+
+    <color name="orange_accent">#FBBF24</color>
+    <color name="green_accent">#34D399</color>
+    <color name="pink_accent">#F472B6</color>
+    <color name="blue_accent">#60A5FA</color>
+
+    <!-- Textes inversés pour fond sombre -->
+    <color name="text_primary">#F5F5F7</color>
+    <color name="text_secondary">#9CA3AF</color>
+    <color name="text_on_purple">#FFFFFF</color>
+
+    <!-- Fond sombre + cartes plus claires -->
+    <color name="background">#121212</color>
+    <color name="card_background">#1E1E1E</color>
+</resources>
