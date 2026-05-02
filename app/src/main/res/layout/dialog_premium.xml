@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header violet dégradé -->
+        <!-- Header violet -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,7 +25,6 @@
             android:paddingTop="20dp"
             android:paddingBottom="20dp">
 
-            <!-- Ligne titre + croix -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -79,7 +78,7 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Fonctionnalités -->
+            <!-- Matières illimitées -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -117,6 +116,7 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Mode Chrono -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -154,6 +154,7 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Export PDF -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -191,11 +192,12 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Statistiques avancées -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="24dp"
                 android:gravity="center_vertical">
 
                 <TextView
@@ -223,43 +225,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Graphiques et analyses détaillées"
-                        android:textColor="#888888"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="24dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="32dp"
-                    android:layout_height="wrap_content"
-                    android:text="🔔"
-                    android:textSize="18sp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Notifications de rappel"
-                        android:textColor="#1F1F1F"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ne ratez plus aucune révision"
                         android:textColor="#888888"
                         android:textSize="12sp" />
                 </LinearLayout>
