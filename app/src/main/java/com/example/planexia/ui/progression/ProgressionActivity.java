@@ -1,6 +1,7 @@
 package com.example.planexia.ui.progression;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,9 +16,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.planexia.R;
 import com.example.planexia.data.PlanexiaRepository;
+import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.ui.modules.ModulesActivity;
+import com.example.planexia.ui.premium.PremiumStatsActivity;
 import com.example.planexia.ui.tasks.TasksActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -33,7 +36,7 @@ public class ProgressionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progression);
 
-        userId = new com.example.planexia.data.SessionManager(this).getUserId();
+        userId     = new SessionManager(this).getUserId();
         repository = new PlanexiaRepository(this);
 
         loadData();
@@ -45,19 +48,37 @@ public class ProgressionActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadData();
+        Button btnPremiumStats = findViewById(R.id.btnPremiumStats);
+        if (btnPremiumStats != null) updateStatsButtonText(btnPremiumStats);
     }
 
     private void setupPremiumButton() {
-        // ← AJOUT : brancher le bouton "Découvrir les statistiques Premium"
-        Button btnPremium = findViewById(R.id.btnDebloquerStatsPremium);
-        if (btnPremium != null) {
-            btnPremium.setOnClickListener(v ->
-                    PremiumDialog.show(this, () -> {
-                        // callback : recharger les données
-                        loadData();
-                    })
-            );
-        }
+        Button btnPremiumStats = findViewById(R.id.btnPremiumStats);
+        if (btnPremiumStats == null) return;
+
+        updateStatsButtonText(btnPremiumStats);
+
+        btnPremiumStats.setOnClickListener(v -> {
+            SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
+            boolean isPremium = prefs.getBoolean("is_premium", false)
+                    || repository.isPremium(userId);
+
+            if (isPremium) {
+                startActivity(new Intent(this, PremiumStatsActivity.class));
+            } else {
+                PremiumDialog.show(this, () -> {
+                    updateStatsButtonText(btnPremiumStats);
+                    startActivity(new Intent(this, PremiumStatsActivity.class));
+                });
+            }
+        });
+    }
+
+    private void updateStatsButtonText(Button btn) {
+        SharedPreferences prefs = getSharedPreferences("planexia_session", MODE_PRIVATE);
+        boolean isPremium = prefs.getBoolean("is_premium", false)
+                || repository.isPremium(userId);
+        btn.setText(isPremium ? "Voir les statistiques avancées" : "Débloquer les statistiques ✦");
     }
 
     private void loadData() {
@@ -70,10 +91,15 @@ public class ProgressionActivity extends AppCompatActivity {
         TextView tvProgress  = findViewById(R.id.tvGlobalPercent);
         TextView tvDoneTasks = findViewById(R.id.tvDoneTasksCount);
         TextView tvTotal     = findViewById(R.id.tvTotalTasksCount);
+        ProgressBar pbGlobal = findViewById(R.id.pbGlobal);
 
         if (tvProgress  != null) tvProgress.setText(globalProgress + "%");
         if (tvDoneTasks != null) tvDoneTasks.setText(String.valueOf(doneTasks));
-        if (tvTotal     != null) tvTotal.setText(totalTasks + " tâches");
+        if (tvTotal     != null) tvTotal.setText(String.valueOf(totalTasks));
+        if (pbGlobal    != null) pbGlobal.setProgress(globalProgress);
+
+        TextView tvPercentBar = findViewById(R.id.tvGlobalPercentBar);
+        if (tvPercentBar != null) tvPercentBar.setText(globalProgress + "%");
 
         LinearLayout containerModules = findViewById(R.id.containerModules);
         if (containerModules == null) return;
@@ -123,20 +149,13 @@ public class ProgressionActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.nav_progression) return true;
             else if (id == R.id.nav_matieres) {
-                startActivity(new Intent(this, ModulesActivity.class));
-                finish();
-                return true;
+                startActivity(new Intent(this, ModulesActivity.class)); finish(); return true;
             } else if (id == R.id.nav_taches) {
-                startActivity(new Intent(this, TasksActivity.class));
-                finish();
-                return true;
+                startActivity(new Intent(this, TasksActivity.class)); finish(); return true;
             } else if (id == R.id.nav_planning) {
-                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class));
-                finish();
-                return true;
+                startActivity(new Intent(this, com.example.planexia.PlanningActivity.class)); finish(); return true;
             } else if (id == R.id.nav_profil) {
-                startActivity(new android.content.Intent(this, com.example.planexia.ProfileActivity.class));
-                finish();
+                startActivity(new Intent(this, com.example.planexia.ProfileActivity.class)); finish(); return true;
             }
             return false;
         });

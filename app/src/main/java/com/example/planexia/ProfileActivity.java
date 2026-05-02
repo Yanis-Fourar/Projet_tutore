@@ -18,6 +18,7 @@ import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Module;
 import com.example.planexia.ui.PremiumDialog;
 import com.example.planexia.ui.modules.ModulesActivity;
+import com.example.planexia.ui.premium.HelpSupportActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -72,17 +73,17 @@ public class ProfileActivity extends AppCompatActivity {
         View dividerSuspendre      = findViewById(R.id.dividerSuspendre);
 
         if (isPremium) {
-            if (btnPasserPremium != null) btnPasserPremium.setVisibility(View.GONE);
+            if (btnPasserPremium != null)  btnPasserPremium.setVisibility(View.GONE);
             if (cardPremiumBanner != null) cardPremiumBanner.setVisibility(View.GONE);
-            if (layoutBadge != null) layoutBadge.setVisibility(View.VISIBLE);
-            if (rowSuspend != null) rowSuspend.setVisibility(View.VISIBLE);
-            if (dividerSuspendre != null) dividerSuspendre.setVisibility(View.VISIBLE);
+            if (layoutBadge != null)       layoutBadge.setVisibility(View.VISIBLE);
+            if (rowSuspend != null)        rowSuspend.setVisibility(View.VISIBLE);
+            if (dividerSuspendre != null)  dividerSuspendre.setVisibility(View.VISIBLE);
         } else {
-            if (btnPasserPremium != null) btnPasserPremium.setVisibility(View.VISIBLE);
+            if (btnPasserPremium != null)  btnPasserPremium.setVisibility(View.VISIBLE);
             if (cardPremiumBanner != null) cardPremiumBanner.setVisibility(View.VISIBLE);
-            if (layoutBadge != null) layoutBadge.setVisibility(View.GONE);
-            if (rowSuspend != null) rowSuspend.setVisibility(View.GONE);
-            if (dividerSuspendre != null) dividerSuspendre.setVisibility(View.GONE);
+            if (layoutBadge != null)       layoutBadge.setVisibility(View.GONE);
+            if (rowSuspend != null)        rowSuspend.setVisibility(View.GONE);
+            if (dividerSuspendre != null)  dividerSuspendre.setVisibility(View.GONE);
         }
     }
 
@@ -106,7 +107,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (rowNotifications != null)
             rowNotifications.setOnClickListener(v -> startActivity(new Intent(this, com.example.planexia.notifications.NotificationsActivity.class)));
         if (rowAide != null)
-            rowAide.setOnClickListener(v -> Toast.makeText(this, "Aide & Support à venir", Toast.LENGTH_SHORT).show());
+            rowAide.setOnClickListener(v -> startActivity(new Intent(this, HelpSupportActivity.class)));
         if (rowDeconnexion != null)
             rowDeconnexion.setOnClickListener(v -> confirmerDeconnexion());
     }

@@ -35,7 +35,7 @@
         <activity android:name=".RegisterActivity" android:exported="false" />
 
         <!-- ===== APP PRINCIPALE ===== -->
-        <activity android:name=".MainActivity"    android:exported="false" />
+        <activity android:name=".MainActivity"     android:exported="false" />
         <activity android:name=".PlanningActivity" android:exported="false" />
 
         <activity android:name=".ui.modules.ModulesActivity" />
@@ -47,6 +47,10 @@
         <activity android:name=".ui.progression.ProgressionActivity" />
         <activity android:name=".ProfileActivity" android:exported="false" />
 
+        <!-- ===== PREMIUM ===== -->
+        <activity android:name=".ui.premium.PremiumStatsActivity" android:exported="false" />
+        <activity android:name=".ui.premium.HelpSupportActivity"  android:exported="false" />
+
         <!-- ===== CHRONO ===== -->
         <activity
             android:name=".ChronoActivity"
@@ -57,7 +61,7 @@
             android:name=".ChronoService"
             android:exported="false"/>
 
-        <!-- Notifications -->
+        <!-- ===== NOTIFICATIONS ===== -->
         <activity android:name=".notifications.NotificationsActivity" android:exported="false"/>
         <receiver android:name=".notifications.TaskReminderReceiver" android:exported="true">
             <intent-filter>
