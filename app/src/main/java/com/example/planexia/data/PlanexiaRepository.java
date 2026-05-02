@@ -33,6 +33,33 @@ public class PlanexiaRepository {
         return db.insert(PlanexiaDatabaseHelper.T_USERS, null, values);
     }
 
+    public boolean isPremium(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(
+                PlanexiaDatabaseHelper.T_USERS,
+                new String[]{PlanexiaDatabaseHelper.C_IS_PREMIUM},
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(userId)},
+                null, null, null
+        );
+        boolean premium = false;
+        if (c.moveToFirst()) premium = c.getInt(0) == 1;
+        c.close();
+        return premium;
+    }
+
+    public void setPremium(long userId, boolean premium) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(PlanexiaDatabaseHelper.C_IS_PREMIUM, premium ? 1 : 0);
+        db.update(
+                PlanexiaDatabaseHelper.T_USERS,
+                values,
+                PlanexiaDatabaseHelper.C_ID + " = ?",
+                new String[]{String.valueOf(userId)}
+        );
+    }
+
     public long login(String email, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
@@ -65,34 +92,6 @@ public class PlanexiaRepository {
         }
         c.close();
         return info;
-    }
-
-    // ← AJOUT : Premium
-    public void setPremium(long userId, boolean isPremium) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(PlanexiaDatabaseHelper.C_IS_PREMIUM, isPremium ? 1 : 0);
-        db.update(
-                PlanexiaDatabaseHelper.T_USERS,
-                values,
-                PlanexiaDatabaseHelper.C_ID + " = ?",
-                new String[]{String.valueOf(userId)}
-        );
-    }
-
-    public boolean isPremium(long userId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(
-                PlanexiaDatabaseHelper.T_USERS,
-                new String[]{PlanexiaDatabaseHelper.C_IS_PREMIUM},
-                PlanexiaDatabaseHelper.C_ID + " = ?",
-                new String[]{String.valueOf(userId)},
-                null, null, null
-        );
-        boolean premium = false;
-        if (c.moveToFirst()) premium = c.getInt(0) == 1;
-        c.close();
-        return premium;
     }
 
     // ---------- MODULES ----------
@@ -477,6 +476,65 @@ public class PlanexiaRepository {
         doneC.close();
 
         return new int[]{total, done};
+    }
+
+    public int getPendingTasksCount(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
+                " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
+                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
+                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ? AND t." + PlanexiaDatabaseHelper.C_IS_DONE + " = 0;";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
+    public int getTotalObjectivesCount(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o" +
+                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
+                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?;";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
+    public int getObjectivesCountForModule(long moduleId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT COUNT(*) FROM " + PlanexiaDatabaseHelper.T_OBJECTIVES +
+                        " WHERE " + PlanexiaDatabaseHelper.C_MODULE_ID + " = ?;",
+                new String[]{String.valueOf(moduleId)}
+        );
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
+    public int[] getTasksDueByDayOfWeek(long userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int[] counts = new int[7];
+        String sql = "SELECT strftime('%w', t." + PlanexiaDatabaseHelper.C_DUE_DATE + "), COUNT(*)" +
+                " FROM " + PlanexiaDatabaseHelper.T_TASKS + " t" +
+                " JOIN " + PlanexiaDatabaseHelper.T_OBJECTIVES + " o ON o." + PlanexiaDatabaseHelper.C_ID + " = t." + PlanexiaDatabaseHelper.C_OBJECTIVE_ID +
+                " JOIN " + PlanexiaDatabaseHelper.T_MODULES + " m ON m." + PlanexiaDatabaseHelper.C_ID + " = o." + PlanexiaDatabaseHelper.C_MODULE_ID +
+                " WHERE m." + PlanexiaDatabaseHelper.C_USER_ID + " = ?" +
+                " AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " IS NOT NULL AND t." + PlanexiaDatabaseHelper.C_DUE_DATE + " != ''" +
+                " GROUP BY strftime('%w', t." + PlanexiaDatabaseHelper.C_DUE_DATE + ");";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(userId)});
+        while (c.moveToNext()) {
+            int dow = c.getInt(0);
+            int count = c.getInt(1);
+            int idx = (dow == 0) ? 6 : dow - 1;
+            counts[idx] = count;
+        }
+        c.close();
+        return counts;
     }
 
     public int[] getProgressForModule(long moduleId) {

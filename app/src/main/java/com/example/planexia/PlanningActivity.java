@@ -4,15 +4,13 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.planexia.data.PlanexiaRepository;
 import com.example.planexia.data.SessionManager;
 import com.example.planexia.model.Task;
-import androidx.cardview.widget.CardView;
-import com.example.planexia.data.PlanexiaRepository;
-import com.example.planexia.data.SessionManager;
 import com.example.planexia.ui.PremiumDialog;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -73,12 +71,10 @@ public class PlanningActivity extends AppCompatActivity {
         bottomNav        = findViewById(R.id.bottomNavigationView);
 
         Button btnPremium = findViewById(R.id.btnDebloquerPremium);
+        btnPremium.setOnClickListener(v -> PremiumDialog.show(this, () -> hidePremiumBanners()));
 
-        // ← MODIFIÉ : brancher le popup Premium
-        btnPremium.setOnClickListener(v ->
-                PremiumDialog.show(this, () -> hidePremiumBanners())
-        );
-
+        Button btnIA = findViewById(R.id.btnIA);
+        if (btnIA != null) btnIA.setOnClickListener(v -> onIAClicked());
     }
 
     private void setupToggle() {
@@ -219,17 +215,18 @@ public class PlanningActivity extends AppCompatActivity {
         }
     }
 
-
     private void hidePremiumBanners() {
-        SessionManager sm = new SessionManager(this);
         PlanexiaRepository repo = new PlanexiaRepository(this);
         boolean isPremium = getSharedPreferences("planexia_session", MODE_PRIVATE)
                 .getBoolean("is_premium", false)
-                || repo.isPremium(sm.getUserId());
+                || repo.isPremium(session.getUserId());
         if (isPremium) {
-            androidx.cardview.widget.CardView cardChrono = findViewById(R.id.cardBannerChrono);
+            CardView cardChrono = findViewById(R.id.cardBannerChrono);
             if (cardChrono != null) cardChrono.setVisibility(android.view.View.GONE);
         }
     }
 
+    private void onIAClicked() {
+        // TODO : lancer la génération IA du planning
+    }
 }

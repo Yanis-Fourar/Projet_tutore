@@ -74,16 +74,12 @@ public class TasksActivity extends AppCompatActivity {
 
         Button btnExportPDF = findViewById(R.id.btnDecouvrirExportPDF);
         if (btnExportPDF != null) {
-            // Texte du bouton selon statut premium
-            if (repository.isPremium(userId)) {
-                btnExportPDF.setText("Exporter en PDF");
-            }
+            if (repository.isPremium(userId)) btnExportPDF.setText("Exporter en PDF");
             btnExportPDF.setOnClickListener(v -> {
                 if (repository.isPremium(userId)) {
                     exportPdf();
                 } else {
                     PremiumDialog.show(this, () -> {
-                        // Après activation premium : changer le texte et exporter
                         btnExportPDF.setText("Exporter en PDF");
                         exportPdf();
                     });

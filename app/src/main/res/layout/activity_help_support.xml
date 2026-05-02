@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F4F1F8">
+
+    <!-- HEADER -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#6C3FC5"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="20dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Retour"
+            android:layout_marginEnd="12dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aide &amp; Support"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comment pouvons-nous vous aider ?"
+                android:textColor="#D4C5F0"
+                android:textSize="13sp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- SECTION FAQ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Questions fréquentes"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#1F1F1F"
+                android:layout_marginBottom="10dp"/>
+
+            <!-- FAQ 1 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <LinearLayout
+                        android:id="@+id/faq1Header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Comment ajouter une matière ?"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F1F1F"/>
+                        <TextView
+                            android:id="@+id/faq1Arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="▼"
+                            android:textColor="#6C3FC5"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/faq1Content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Rendez-vous dans l'onglet Matières, puis appuyez sur le bouton + en bas à droite. Renseignez le nom, le coefficient et choisissez une couleur pour votre matière."
+                        android:textSize="13sp"
+                        android:textColor="#555555"
+                        android:visibility="gone"
+                        android:paddingTop="10dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- FAQ 2 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <LinearLayout
+                        android:id="@+id/faq2Header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Comment marquer une tâche comme terminée ?"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F1F1F"/>
+                        <TextView
+                            android:id="@+id/faq2Arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="▼"
+                            android:textColor="#6C3FC5"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/faq2Content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dans l'onglet Tâches ou dans le détail d'un objectif, appuyez sur le cercle à gauche de la tâche pour la cocher comme terminée. La progression se met à jour automatiquement."
+                        android:textSize="13sp"
+                        android:textColor="#555555"
+                        android:visibility="gone"
+                        android:paddingTop="10dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- FAQ 3 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <LinearLayout
+                        android:id="@+id/faq3Header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Comment fonctionne la progression ?"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F1F1F"/>
+                        <TextView
+                            android:id="@+id/faq3Arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="▼"
+                            android:textColor="#6C3FC5"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/faq3Content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="La progression est calculée en fonction du nombre de tâches complétées par rapport au total. L'onglet Progression affiche un résumé global et une barre de progression par matière."
+                        android:textSize="13sp"
+                        android:textColor="#555555"
+                        android:visibility="gone"
+                        android:paddingTop="10dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- FAQ 4 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <LinearLayout
+                        android:id="@+id/faq4Header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Qu'est-ce que le Premium ?"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F1F1F"/>
+                        <TextView
+                            android:id="@+id/faq4Arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="▼"
+                            android:textColor="#6C3FC5"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/faq4Content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Le compte Premium débloque les matières illimitées (la version gratuite est limitée à 3), ainsi que les statistiques avancées : graphiques temps réel, analyse hebdomadaire, répartition détaillée par matière."
+                        android:textSize="13sp"
+                        android:textColor="#555555"
+                        android:visibility="gone"
+                        android:paddingTop="10dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- SECTION CONTACT -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nous contacter"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#1F1F1F"
+                android:layout_marginBottom="10dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✉️"
+                        android:textSize="22sp"
+                        android:layout_marginEnd="14dp"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Support par e-mail"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F1F1F"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="support@planexia.app"
+                            android:textSize="13sp"
+                            android:textColor="#6C3FC5"/>
+                    </LinearLayout>
+                    <Button
+                        android:id="@+id/btnEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="Écrire"
+                        android:textAllCaps="false"
+                        android:textSize="13sp"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#6C3FC5"
+                        app:cornerRadius="10dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- SECTION À PROPOS -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="À propos"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#1F1F1F"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="10dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="10dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Application" android:textSize="13sp" android:textColor="#888888"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Planexia" android:textSize="13sp" android:textColor="#1F1F1F" android:textStyle="bold"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0EBF8" android:layout_marginBottom="10dp"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="10dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Version" android:textSize="13sp" android:textColor="#888888"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1.0.0" android:textSize="13sp" android:textColor="#1F1F1F" android:textStyle="bold"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0EBF8" android:layout_marginBottom="10dp"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Base de données" android:textSize="13sp" android:textColor="#888888"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Locale (SQLite)" android:textSize="13sp" android:textColor="#1F1F1F" android:textStyle="bold"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
