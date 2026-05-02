@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F7FB"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Logo centré -->
+        <ImageView
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:background="@drawable/book"
+            android:padding="16dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:contentDescription="Logo" />
+
+        <!-- Titre -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bon retour !"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1F1F1F"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp" />
+
+        <!-- Sous-titre -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connecte-toi à ton compte Planexia"
+            android:textSize="13sp"
+            android:textColor="#777777"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="36dp" />
+
+        <!-- Email -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Email"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:textSize="13sp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="ton.email@exemple.com"
+            android:textColorHint="#9CA3AF"
+            android:paddingStart="14dp"
+            android:paddingEnd="16dp"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="10dp"
+            android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress"
+            android:textSize="14sp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Mot de passe -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mot de passe"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:textSize="13sp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="Ton mot de passe"
+            android:textColorHint="#9CA3AF"
+            android:paddingStart="14dp"
+            android:paddingEnd="16dp"
+            android:drawableStart="@drawable/ic_lock"
+            android:drawablePadding="10dp"
+            android:inputType="textPassword"
+            android:autofillHints="password"
+            android:textSize="14sp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Ligne : "Se souvenir de moi" + "Mot de passe oublié ?" -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="28dp">
+
+            <CheckBox
+                android:id="@+id/cbRememberMe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="Se souvenir de moi"
+                android:textSize="13sp"
+                android:textColor="#555555"
+                android:buttonTint="#7C3AED" />
+
+            <TextView
+                android:id="@+id/tvForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="Mot de passe oublié ?"
+                android:textSize="13sp"
+                android:textColor="#7C3AED"
+                android:textStyle="bold"
+                android:padding="4dp" />
+        </RelativeLayout>
+
+        <!-- Bouton Se connecter (dégradé) -->
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Se connecter"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_gradient" />
+
+        <!-- "Pas encore de compte ? Créer un compte" -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="28dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pas encore de compte ? "
+                android:textSize="13sp"
+                android:textColor="#777777" />
+
+            <TextView
+                android:id="@+id/tvGoRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Créer un compte"
+                android:textSize="13sp"
+                android:textColor="#7C3AED"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
