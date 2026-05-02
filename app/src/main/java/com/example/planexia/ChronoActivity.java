@@ -56,8 +56,9 @@ public class ChronoActivity extends AppCompatActivity {
             syncFromService();
 
             // Afficher le dialog si on vient de la notification
-            if (pendingShowGoalDialog && chronoService.isGoalReached() && !dialogShowing) {
+            if (pendingShowGoalDialog && chronoService.isGoalReached() && !dialogShowing && !goalHandled) {
                 pendingShowGoalDialog = false;
+                goalHandled = true;
                 onGoalReached();
             }
         }
@@ -75,9 +76,12 @@ public class ChronoActivity extends AppCompatActivity {
                 tvChronoTime.setText(formatTime(elapsed));
                 updateGoalDisplay(elapsed);
             } else if (ChronoService.ACTION_GOAL_REACHED.equals(intent.getAction())) {
-                // BUG FIX 1 : on reçoit le broadcast quand l'app est au premier plan
-                // → afficher le dialog SANS couper l'alarme (c'est le service qui sonne)
-                if (!dialogShowing) onGoalReached();
+                // On reçoit le broadcast quand l'app est au premier plan
+                // → goalHandled évite le double déclenchement avec onResume()
+                if (!dialogShowing && !goalHandled) {
+                    goalHandled = true;
+                    onGoalReached();
+                }
             }
         }
     };
@@ -89,6 +93,7 @@ public class ChronoActivity extends AppCompatActivity {
     private String  currentModuleName    = "";
     private boolean dialogShowing        = false;
     private boolean pendingShowGoalDialog = false;
+    private boolean goalHandled          = false;  // évite le double déclenchement du son/dialog
     /** true quand l'utilisateur quitte volontairement (retour, annuler) — false si navigation barre du bas */
     private boolean intentionalExit      = false;
 
@@ -184,7 +189,8 @@ public class ChronoActivity extends AppCompatActivity {
             }
             syncFromService();
         }
-        if (serviceBound && chronoService != null && chronoService.isGoalReached() && !dialogShowing) {
+        if (serviceBound && chronoService != null && chronoService.isGoalReached() && !dialogShowing && !goalHandled) {
+            goalHandled = true;
             onGoalReached();
         }
     }
@@ -318,6 +324,7 @@ public class ChronoActivity extends AppCompatActivity {
             goalMinutes   = min;
             goalMs        = (long) goalMinutes * 60 * 1000;
             dialogShowing = false;
+            goalHandled   = false;  // réinitialiser pour la nouvelle session
             dialog.dismiss();
 
             String label = currentTaskTitle.isEmpty() ? "Session d'étude" : currentTaskTitle;
@@ -359,6 +366,7 @@ public class ChronoActivity extends AppCompatActivity {
                 .setPositiveButton("Même objectif", (d, w) -> {
                     stopAlarm(); // ← l'alarme s'arrête ICI, quand l'user appuie
                     dialogShowing = false;
+                    goalHandled   = false;  // réinitialiser pour la nouvelle session
                     tvChronoTime.setText("00:00");
                     tvSessionStatus.setText("Session en cours");
                     btnPause.setImageResource(android.R.drawable.ic_media_pause);
@@ -367,6 +375,7 @@ public class ChronoActivity extends AppCompatActivity {
                 .setNegativeButton("Changer l'objectif", (d, w) -> {
                     stopAlarm();
                     dialogShowing = false;
+                    goalHandled   = false;  // réinitialiser pour la nouvelle session
                     tvChronoTime.setText("00:00");
                     showGoalDialog();
                 })

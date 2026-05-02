@@ -57,6 +57,7 @@ public class ChronoService extends Service {
     // ── Alarme contrôlable ────────────────────────────────────────
     private Ringtone alarmRingtone  = null;
     private Vibrator activeVibrator = null;
+    private boolean  alarmStarted   = false;  // évite de jouer le son deux fois
 
     private int    goalMinutes = 0;
     private long   goalMs      = 0L;
@@ -102,6 +103,7 @@ public class ChronoService extends Service {
         this.goalMs      = (long) goalMin * 60 * 1000;
         this.taskLabel   = label;
         this.goalReached = false;
+        this.alarmStarted = false;  // réinitialiser pour la nouvelle session
         this.elapsedTime = 0L;
         this.startTime   = System.currentTimeMillis();
         this.isRunning   = true;
@@ -142,6 +144,7 @@ public class ChronoService extends Service {
      * Appelé uniquement quand l'utilisateur appuie sur un bouton du dialog.
      */
     public void stopAlarm() {
+        alarmStarted = false;  // permettre de rejouer pour la prochaine session
         try {
             if (alarmRingtone != null && alarmRingtone.isPlaying()) {
                 alarmRingtone.stop();
@@ -205,6 +208,9 @@ public class ChronoService extends Service {
     //  Son en BOUCLE (fonctionne dans l'app ET hors app)
     // ═════════════════════════════════════════════════════════════
     private void playAlarmLooping() {
+        // Sécurité : ne pas jouer le son deux fois si déjà en cours
+        if (alarmStarted) return;
+        alarmStarted = true;
         // Vibration en boucle
         try {
             activeVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
